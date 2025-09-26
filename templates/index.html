@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Планувальник подій</title>
+</head>
+<body>
+    <h1>Мій планувальник</h1>
+
+    <form method="POST" action="/add">
+        <input type="text" name="title" placeholder="Назва події" required>
+        <input type="date" name="date" required>
+        <input type="text" name="description" placeholder="Опис">
+        <button type="submit">Додати</button>
+    </form>
+
+    <h2>Події:</h2>
+    <ul>
+        {% for e in events %}
+        <li>{{ e }}</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
