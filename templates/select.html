@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Вибір року і місяця</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; }
+        select { padding: 5px; margin: 10px; }
+    </style>
+</head>
+<body>
+    <h1>Виберіть рік і місяць</h1>
+    <form method="GET" action="{{ url_for('events_by_month', year=0, month=0) }}" onsubmit="return goToMonth()">
+        <select id="year">
+            {% for y in years %}
+                <option value="{{ y }}">{{ y }}</option>
+            {% endfor %}
+        </select>
+        <select id="month">
+            {% for m, name in months %}
+                <option value="{{ m }}">{{ name }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit">Перейти</button>
+    </form>
+
+    <script>
+        function goToMonth() {
+            const y = document.getElementById("year").value;
+            const m = document.getElementById("month").value;
+            window.location.href = `/month/${y}/${m}`;
+            return false;
+        }
+    </script>
+</body>
+</html>

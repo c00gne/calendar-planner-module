@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Події за день</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        .message { background: #dff0d8; color: #3c763d; padding: 10px; margin-bottom: 20px; border-radius: 5px; }
+        .back { margin-top: 20px; display: block; text-decoration: none; color: blue; }
+    </style>
+</head>
+<body>
+    <h1>Події за {{ date.strftime('%Y-%m-%d') }}</h1>
+    {% if message %}
+        <div class="message">{{ message }}</div>
+    {% endif %}
+    <ul>
+        {% for e in events %}
+            <li>{{ e.title }} — {{ e.description }}</li>
+        {% endfor %}
+    </ul>
+    <a href="{{ url_for('events_by_month', year=date.year, month=date.month) }}" class="back">⬅ Назад до місяця</a>
+</body>
+</html>

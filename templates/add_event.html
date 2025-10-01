@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Додати подію</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        form { margin: 20px; }
+        .back { margin-top: 20px; display: block; text-decoration: none; color: blue; }
+    </style>
+</head>
+<body>
+    <h1>Додати подію ({{ date.strftime('%Y-%m-%d') }})</h1>
+    <form method="POST" action="/add">
+        <input type="hidden" name="date" value="{{ date.strftime('%Y-%m-%d') }}">
+        <input type="text" name="title" placeholder="Назва події" required><br><br>
+        <input type="text" name="description" placeholder="Опис"><br><br>
+        <button type="submit">Додати</button>
+    </form>
+    <a href="{{ url_for('events_by_month', year=date.year, month=date.month) }}" class="back">⬅ Назад</a>
+</body>
+</html>
