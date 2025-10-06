@@ -2,21 +2,138 @@
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
-    <title>Додати подію</title>
+    <title>Додати подію - Compact Planner</title>
     <style>
-        body { font-family: Arial, sans-serif; }
-        form { margin: 20px; }
-        .back { margin-top: 20px; display: block; text-decoration: none; color: blue; }
+        body { 
+            font-family: 'Arial', sans-serif; 
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            min-height: 100vh;
+        }
+        .user-info {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 14px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 10px 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .user-info a {
+            margin-left: 10px;
+            color: #764ba2;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 80px 20px 20px;
+        }
+        .content {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #764ba2;
+        }
+        .form-group {
+            margin-bottom: 25px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #764ba2;
+        }
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+            box-sizing: border-box;
+        }
+        .form-group input:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        .btn {
+            padding: 15px 30px;
+            background: #764ba2;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-bottom: 15px;
+        }
+        .btn:hover {
+            background: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        .btn-secondary {
+            background: #6c757d;
+        }
+        .btn-secondary:hover {
+            background: #545b62;
+        }
+        .date-display {
+            text-align: center;
+            font-size: 1.2em;
+            color: #667eea;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
-    <h1>Додати подію ({{ date.strftime('%Y-%m-%d') }})</h1>
-    <form method="POST" action="/add">
-        <input type="hidden" name="date" value="{{ date.strftime('%Y-%m-%d') }}">
-        <input type="text" name="title" placeholder="Назва події" required><br><br>
-        <input type="text" name="description" placeholder="Опис"><br><br>
-        <button type="submit">Додати</button>
-    </form>
-    <a href="{{ url_for('events_by_month', year=date.year, month=date.month) }}" class="back">⬅ Назад</a>
+    <div class="user-info">
+        {% if current_user.is_authenticated %}
+            <span>👋 {{ current_user.username }}</span>
+            <a href="{{ url_for('logout') }}">🚪 Вийти</a>
+        {% endif %}
+    </div>
+
+    <div class="container">
+        <div class="content">
+            <div class="header">
+                <h1>➕ Додати подію</h1>
+                <div class="date-display">📅 {{ date.strftime('%d.%m.%Y') }}</div>
+            </div>
+
+            <form method="POST" action="/add">
+                <input type="hidden" name="date" value="{{ date.strftime('%Y-%m-%d') }}">
+                
+                <div class="form-group">
+                    <label for="title">Назва події *</label>
+                    <input type="text" id="title" name="title" placeholder="Введіть назву події" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="description">Опис події</label>
+                    <input type="text" id="description" name="description" placeholder="Введіть опис (необов'язково)">
+                </div>
+                
+                <button type="submit" class="btn">💾 Зберегти подію</button>
+            </form>
+
+            <a href="{{ url_for('events_by_month', year=date.year, month=date.month) }}" class="btn btn-secondary">🔙 Назад до календаря</a>
+        </div>
+    </div>
 </body>
 </html>

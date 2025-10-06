@@ -2,28 +2,182 @@
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
-    <title>Події за день</title>
+    <title>Події за день - Compact Planner</title>
     <style>
-        body { font-family: Arial, sans-serif; }
-        .message { background: #dff0d8; color: #3c763d; padding: 10px; margin-bottom: 20px; border-radius: 5px; }
-        .back { margin-top: 20px; display: block; text-decoration: none; color: blue; }
+        body { 
+            font-family: 'Arial', sans-serif; 
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            min-height: 100vh;
+        }
+        .user-info {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 14px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 10px 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .user-info a {
+            margin-left: 10px;
+            color: #764ba2;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 80px 20px 20px;
+        }
+        .content {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #764ba2;
+        }
+        .message { 
+            background: #d4edda; 
+            color: #155724; 
+            padding: 15px; 
+            margin-bottom: 20px; 
+            border-radius: 8px;
+            border-left: 4px solid #28a745;
+        }
+        .events-list {
+            list-style: none;
+            padding: 0;
+        }
+        .event-item {
+            background: white;
+            margin: 15px 0;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 5px solid #667eea;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+        .event-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.3);
+        }
+        .event-title {
+            font-weight: bold;
+            color: #764ba2;
+            font-size: 1.2em;
+            margin-bottom: 5px;
+        }
+        .event-description {
+            color: #666;
+            margin-bottom: 10px;
+        }
+        .event-actions a {
+            margin-right: 15px;
+            text-decoration: none;
+            padding: 5px 12px;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        .edit-btn {
+            background: #ffc107;
+            color: #000;
+        }
+        .delete-btn {
+            background: #dc3545;
+            color: white;
+        }
+        .edit-btn:hover {
+            background: #e0a800;
+        }
+        .delete-btn:hover {
+            background: #c82333;
+        }
+        .navigation {
+            text-align: center;
+            margin-top: 30px;
+        }
+        .btn {
+            padding: 12px 25px;
+            background: #764ba2;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: bold;
+            display: inline-block;
+            margin: 0 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            background: #667eea;
+        }
+        .no-events {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+            padding: 40px;
+        }
     </style>
 </head>
 <body>
-    <h1>Події за {{ date.strftime('%Y-%m-%d') }}</h1>
-    {% if message %}
-        <div class="message">{{ message }}</div>
-    {% endif %}
-    <ul>
-    {% for e in events %}
-        <li>
-            {{ e.title }} — {{ e.description }}
-            <a href="{{ url_for('edit_event_form', event_id=e.id) }}">✏</a>
-            <a href="{{ url_for('delete_event', event_id=e.id) }}" onclick="return confirm('Видалити подію?')">🗑</a>
-        </li>
-    {% endfor %}
-</ul>
+    <div class="user-info">
+        {% if current_user.is_authenticated %}
+            <span>👋 {{ current_user.username }}</span>
+            <a href="{{ url_for('logout') }}">🚪 Вийти</a>
+        {% endif %}
+    </div>
 
-    <a href="{{ url_for('events_by_month', year=date.year, month=date.month) }}" class="back">⬅ Назад до місяця</a>
+    <div class="container">
+        <div class="content">
+            <div class="header">
+                <h1>📖 Події за {{ date.strftime('%d.%m.%Y') }}</h1>
+            </div>
+
+            {% if message %}
+                <div class="message">{{ message }}</div>
+            {% endif %}
+            
+            {% if events %}
+                <ul class="events-list">
+                {% for e in events %}
+                    <li class="event-item">
+                        <div class="event-title">{{ e.title }}</div>
+                        {% if e.description %}
+                            <div class="event-description">{{ e.description }}</div>
+                        {% endif %}
+                        <div class="event-actions">
+                            <a href="{{ url_for('edit_event_form', event_id=e.id) }}" class="edit-btn">✏️ Редагувати</a>
+                            <a href="{{ url_for('delete_event', event_id=e.id) }}" class="delete-btn" onclick="return confirm('Ви впевнені, що хочете видалити цю подію?')">🗑️ Видалити</a>
+                        </div>
+                    </li>
+                {% endfor %}
+                </ul>
+            {% else %}
+                <div class="no-events">
+                    <h3>🎉 На цей день подій немає</h3>
+                    <p>Створіть першу подію, натиснувши кнопку нижче</p>
+                </div>
+            {% endif %}
+
+            <div class="navigation">
+                <a href="{{ url_for('add_event_form', date=date.strftime('%Y-%m-%d')) }}" class="btn">➕ Додати подію</a>
+                <a href="{{ url_for('events_by_month', year=date.year, month=date.month) }}" class="btn">📅 Назад до місяця</a>
+                <a href="{{ url_for('home') }}" class="btn">🏠 На головну</a>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

@@ -2,33 +2,175 @@
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
-    <title>Події за місяць</title>
+    <title>Календар на місяць - Compact Planner</title>
     <style>
-        body { font-family: Arial, sans-serif; }
-        .calendar { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin-top: 20px; }
-        .day { border: 1px solid #ccc; padding: 10px; min-height: 80px; position: relative; }
-        .day .add { position: absolute; bottom: 5px; right: 5px; font-size: 12px; color: blue; cursor: pointer; }
-        .day h4 { margin: 0; font-size: 14px; }
-        .day ul { margin: 5px 0 0 0; padding: 0; list-style: none; font-size: 12px; }
-        .more { margin-top: 20px; padding: 10px 20px; background: #eee; border: 1px solid #ccc; cursor: pointer; }
+        body { 
+            font-family: 'Arial', sans-serif; 
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            min-height: 100vh;
+        }
+        .user-info {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 14px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 10px 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .user-info a {
+            margin-left: 10px;
+            color: #764ba2;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .user-info a:hover {
+            text-decoration: underline;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 80px 20px 20px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+        }
+        .header h1 {
+            font-size: 2.5em;
+            margin: 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        .calendar { 
+            display: grid; 
+            grid-template-columns: repeat(7, 1fr); 
+            gap: 10px; 
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+        }
+        .day { 
+            border: 2px solid #e0e0e0; 
+            padding: 15px; 
+            min-height: 120px; 
+            position: relative;
+            border-radius: 10px;
+            background: white;
+            transition: all 0.3s ease;
+        }
+        .day:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+            border-color: #667eea;
+        }
+        .day h4 { 
+            margin: 0 0 10px 0; 
+            font-size: 16px; 
+            color: #764ba2;
+            font-weight: bold;
+        }
+        .day ul { 
+            margin: 5px 0 0 0; 
+            padding: 0; 
+            list-style: none; 
+            font-size: 12px; 
+        }
+        .day li {
+            background: #f0f4ff;
+            margin: 2px 0;
+            padding: 3px 6px;
+            border-radius: 4px;
+            border-left: 3px solid #667eea;
+        }
+        .add-btn { 
+            position: absolute; 
+            bottom: 10px; 
+            right: 10px; 
+            font-size: 16px; 
+            color: #667eea; 
+            cursor: pointer;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .day-btn { 
+            position: absolute; 
+            top: 10px; 
+            right: 10px; 
+            font-size: 12px; 
+            color: #28a745; 
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .navigation {
+            text-align: center;
+            margin-top: 30px;
+        }
+        .btn {
+            padding: 12px 25px;
+            background: white;
+            color: #764ba2;
+            border: none;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: bold;
+            display: inline-block;
+            margin: 0 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+            background: #764ba2;
+            color: white;
+        }
+        .month-year {
+            font-size: 1.2em;
+            color: white;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
-    <h1>Події за {{ month }}.{{ year }}</h1>
-    <div class="calendar">
-        {% for day in days %}
-        <div class="day">
-            <h4>{{ day.day }}</h4>
-            <ul>
-                {% for e in day.events %}
-                <li>{{ e.title }}</li>
-                {% endfor %}
-            </ul>
-            <a href="{{ url_for('add_event_form', date='%04d-%02d-%02d' % (year, month, day.day)) }}" class="add">+</a>
-            <a href="{{ url_for('events_by_day', date='%04d-%02d-%02d' % (year, month, day.day)) }}" style="position:absolute;top:5px;right:5px;font-size:12px;color:green;">День</a>
-        </div>
-        {% endfor %}
+    <div class="user-info">
+        {% if current_user.is_authenticated %}
+            <span>👋 {{ current_user.username }}</span>
+            <a href="{{ url_for('logout') }}">🚪 Вийти</a>
+        {% endif %}
     </div>
-    <a href="{{ url_for('home') }}" class="more">Більше</a>
+
+    <div class="container">
+        <div class="header">
+            <h1>📅 Календар</h1>
+            <div class="month-year">{{ month }} / {{ year }}</div>
+        </div>
+
+        <div class="calendar">
+            {% for day in days %}
+            <div class="day">
+                <h4>{{ day.day }}</h4>
+                <ul>
+                    {% for e in day.events %}
+                    <li title="{{ e.description }}">{{ e.title }}</li>
+                    {% endfor %}
+                </ul>
+                <a href="{{ url_for('add_event_form', date='%04d-%02d-%02d' % (year, month, day.day)) }}" class="add-btn">➕ Додати</a>
+                <a href="{{ url_for('events_by_day', date='%04d-%02d-%02d' % (year, month, day.day)) }}" class="day-btn">📖 День</a>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="navigation">
+            <a href="{{ url_for('select_view') }}" class="btn">🔙 Вибрати інший місяць</a>
+            <a href="{{ url_for('home') }}" class="btn">🏠 На головну</a>
+        </div>
+    </div>
 </body>
 </html>

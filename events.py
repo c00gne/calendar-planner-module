@@ -19,7 +19,7 @@ class Event:
 class EventManager:
     def __init__(self):
         self.events = []
-        self.load_from_file()  # автоматично підвантажує події при старті
+        self.load_from_file()  # ивенты на старте с файлика
 
     def add_event(self, event: Event):
         self.events.append(event)
@@ -64,6 +64,6 @@ class EventManager:
                     ev = Event(d["title"], date.fromisoformat(d["date"]), d.get("description", ""))
                     ev.id = d["id"]
                     self.events.append(ev)
-                # поновлюємо лічильник ID
+                # обновляется счетчик ID
                 if self.events:
                     Event._id_counter = max(e.id for e in self.events) + 1

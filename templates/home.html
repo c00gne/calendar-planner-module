@@ -3,73 +3,75 @@
 <head>
     <meta charset="UTF-8">
     <title>Compact Planner</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <style>
         body {
             font-family: Arial, sans-serif;
             text-align: center;
             margin-top: 150px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            height: 100vh;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 40px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            max-width: 500px;
+            margin: 0 auto;
         }
         .btn {
-            padding: 10px 20px;
-            background: #eee;
-            border: 1px solid #ccc;
+            padding: 15px 30px;
+            background: #fff;
+            color: #667eea;
+            border: none;
+            border-radius: 25px;
             text-decoration: none;
             cursor: pointer;
+            font-size: 18px;
+            font-weight: bold;
+            margin: 20px 10px;
+            display: inline-block;
+            transition: transform 0.3s;
         }
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1;
-            left: 0; top: 0;
-            width: 100%; height: 100%;
-            background-color: rgba(0,0,0,0.5);
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
         }
-        .modal-content {
-            background: #fff;
-            margin: 15% auto;
-            padding: 20px;
-            width: 300px;
-            border-radius: 5px;
+        .auth-links {
+            margin-top: 30px;
         }
-        select { padding: 5px; margin: 10px; }
+        .auth-links a {
+            color: white;
+            margin: 0 10px;
+            text-decoration: none;
+        }
+        .auth-links a:hover {
+            text-decoration: underline;
+        }
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 30px;
+        }
     </style>
 </head>
 <body>
-    <h1>Welcome to my compact planner</h1>
-    <button class="btn" onclick="document.getElementById('myModal').style.display='block'">
-        Більше
-    </button>
-    <div id="myModal" class="modal">
-        <div class="modal-content">
-            <h3>Виберіть рік і місяць</h3>
-            <form onsubmit="return goToMonth()" style="margin-top:30px;">
-                <select id="year">
-                    {% for y in range(2020, 2031) %}
-                        <option value="{{ y }}">{{ y }}</option>
-                    {% endfor %}
-                </select>
-                <select id="month">
-                    {% for m in range(1, 13) %}
-                        <option value="{{ m }}">{{ ['Січень','Лютий','Березень','Квітень','Травень','Червень','Липень','Серпень','Вересень','Жовтень','Листопад','Грудень'][m-1] }}</option>
-                    {% endfor %}
-                </select>
-                <button type="submit" class="btn">Переглянути місяць</button>
-            </form>
-        </div>
+    <div class="container">
+        <h1>🏗️ Compact Planner</h1>
+        <p style="font-size: 1.2em; margin-bottom: 30px;">Організуйте ваші події та завдання</p>
+        
+        {% if current_user.is_authenticated %}
+            <a href="{{ url_for('select_view') }}" class="btn">🚀 ПОЧАТИ РОБОТУ</a>
+            <div class="auth-links">
+                <span>Welcome, {{ current_user.username }}!</span>
+                <a href="{{ url_for('logout') }}">Вийти</a>
+            </div>
+        {% else %}
+            <p style="margin-bottom: 30px;">Увійдіть або зареєструйтесь для початку роботи</p>
+            <a href="{{ url_for('login') }}" class="btn">🔑 Увійти</a>
+            <a href="{{ url_for('register') }}" class="btn">📝 Зареєструватись</a>
+        {% endif %}
     </div>
-    <script>
-        function goToMonth() {
-            const y = document.getElementById("year").value;
-            const m = document.getElementById("month").value;
-            window.location.href = `/month/${y}/${m}`;
-            return false;
-        }
-        window.onclick = function(event) {
-            var modal = document.getElementById('myModal');
-            if (event.target == modal) {
-                modal.style.display = "none";
-            }
-        }
-    </script>
 </body>
 </html>

@@ -1,6 +1,49 @@
-__pycache__/
-*.pyc
-instance/
-.env
-venv/
+# Базы данных
+*.db
 *.sqlite3
+*.db-journal
+
+# Файлы SQLite
+*.sqlite
+
+# Виртуальное окружение
+.venv
+venv/
+env/
+
+# Файлы окружения
+.env
+.env.local
+.env.production
+
+# Файлы журналов
+*.log
+logs/
+
+# Кэш Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Операционные системы
+.DS_Store
+Thumbs.db
+
+# Миграции базы данных (если будете использовать миграции)
+migrations/
+
+# Файлы сессий
+flask_session/
+
+# Временные файлы
+tmp/
+temp/

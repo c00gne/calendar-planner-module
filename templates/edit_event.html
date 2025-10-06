@@ -1,6 +1,134 @@
-<form method="POST" action="/edit/{{ event.id }}">
-    <input type="date" name="date" value="{{ event.date }}" required><br>
-    <input type="text" name="title" value="{{ event.title }}" required><br>
-    <input type="text" name="description" value="{{ event.description }}"><br>
-    <button type="submit">Зберегти</button>
-</form>
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Редагувати подію - Compact Planner</title>
+    <style>
+        body { 
+            font-family: 'Arial', sans-serif; 
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            min-height: 100vh;
+        }
+        .user-info {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 14px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 10px 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .user-info a {
+            margin-left: 10px;
+            color: #764ba2;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 80px 20px 20px;
+        }
+        .content {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #764ba2;
+        }
+        .form-group {
+            margin-bottom: 25px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #764ba2;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+            box-sizing: border-box;
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        .btn {
+            padding: 15px 30px;
+            background: #764ba2;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-bottom: 15px;
+        }
+        .btn:hover {
+            background: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        .btn-secondary {
+            background: #6c757d;
+        }
+        .btn-secondary:hover {
+            background: #545b62;
+        }
+    </style>
+</head>
+<body>
+    <div class="user-info">
+        {% if current_user.is_authenticated %}
+            <span>👋 {{ current_user.username }}</span>
+            <a href="{{ url_for('logout') }}">🚪 Вийти</a>
+        {% endif %}
+    </div>
+
+    <div class="container">
+        <div class="content">
+            <div class="header">
+                <h1>✏️ Редагувати подію</h1>
+            </div>
+
+            <form method="POST" action="/edit/{{ event.id }}">
+                <div class="form-group">
+                    <label for="date">Дата *</label>
+                    <input type="date" id="date" name="date" value="{{ event.date.strftime('%Y-%m-%d') }}" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="title">Назва події *</label>
+                    <input type="text" id="title" name="title" value="{{ event.title }}" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="description">Опис події</label>
+                    <input type="text" id="description" name="description" value="{{ event.description }}">
+                </div>
+                
+                <button type="submit" class="btn">💾 Зберегти зміни</button>
+            </form>
+
+            <a href="{{ url_for('events_by_day', date=event.date.strftime('%Y-%m-%d')) }}" class="btn btn-secondary">🔙 Назад до дня</a>
+        </div>
+    </div>
+</body>
+</html>
