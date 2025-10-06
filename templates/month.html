@@ -263,7 +263,6 @@
             visibility: hidden;
         }
         
-        /* Стили для блока найближчих подій */
         .upcoming-events {
             position: relative;
             display: inline-block;
@@ -371,7 +370,6 @@
             padding: 10px 0;
         }
 
-        /* Стили для переключателя тем */
         .theme-switcher {
             position: fixed;
             bottom: 30px;
@@ -449,7 +447,6 @@
             font-weight: 500;
         }
         
-        /* Классы для разных тем */
         .theme-purple {
             --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             --primary-color: #764ba2;
@@ -480,7 +477,6 @@
             --secondary-color: #3498db;
         }
         
-        /* Применение CSS переменных */
         body {
             background: var(--primary-gradient);
         }
@@ -527,7 +523,6 @@
     </div>
 
     <div class="container">
-        <!-- Шапка календаря с навигацией -->
         <div class="calendar-header">
             <button class="nav-btn" onclick="navigateMonth(-1)">‹</button>
             
@@ -551,7 +546,6 @@
             </div>
         </div>
 
-        <!-- Дни недели -->
         <div class="week-days">
             <div class="week-day">Пн</div>
             <div class="week-day">Вт</div>
@@ -562,7 +556,6 @@
             <div class="week-day">Нд</div>
         </div>
 
-        <!-- Сетка календаря -->
         <div class="calendar">
             {% for day in days %}
                 {% if day.day %}
@@ -590,7 +583,6 @@
             <a href="{{ url_for('home') }}" class="btn">🏠 На головну</a>
         </div>
 
-        <!-- Блок найближчих дат -->
         <div class="upcoming-events">
             <button class="btn-upcoming" onclick="toggleUpcoming()">📅 Найближчі події</button>
             <div class="upcoming-dropdown" id="upcomingDropdown">
@@ -639,7 +631,6 @@
         </div>
     </div>
 
-    <!-- Переключатель тем -->
     <div class="theme-switcher">
         <button class="theme-btn" onclick="toggleThemeMenu()">🎨</button>
         <div class="theme-menu" id="themeMenu">
@@ -667,7 +658,6 @@
     </div>
 
     <script>
-        // Навигация по месяцам
         function navigateMonth(direction) {
             const currentYear = {{ year }};
             const currentMonth = {{ month }};
@@ -686,7 +676,6 @@
             window.location.href = `/month/${newYear}/${newMonth}`;
         }
 
-        // Управление выбором года
         function toggleYears() {
             const dropdown = document.getElementById('yearsDropdown');
             dropdown.classList.toggle('show');
@@ -697,39 +686,31 @@
             window.location.href = `/month/${year}/${currentMonth}`;
         }
 
-        // Управление блоком найближчих событий
         function toggleUpcoming() {
             const dropdown = document.getElementById('upcomingDropdown');
             dropdown.classList.toggle('show');
         }
 
-        // Управление переключателем тем
         function toggleThemeMenu() {
             const menu = document.getElementById('themeMenu');
             menu.classList.toggle('show');
         }
         
         function changeTheme(themeName) {
-            // Удаляем все классы тем
             document.body.classList.remove('theme-purple', 'theme-orange', 'theme-blue', 'theme-green', 'theme-dark');
             
-            // Добавляем выбранную тему
             document.body.classList.add(`theme-${themeName}`);
             
-            // Сохраняем в localStorage
             localStorage.setItem('selectedTheme', themeName);
             
-            // Закрываем меню
             document.getElementById('themeMenu').classList.remove('show');
         }
         
-        // Загрузка сохраненной темы при загрузке страницы
         document.addEventListener('DOMContentLoaded', function() {
             const savedTheme = localStorage.getItem('selectedTheme') || 'purple';
             changeTheme(savedTheme);
         });
 
-        // Закрытие всех dropdown при клике вне их
         document.addEventListener('click', function(event) {
             const dropdown = document.getElementById('yearsDropdown');
             const yearBtn = document.querySelector('.year-btn');
@@ -751,13 +732,11 @@
             }
         });
 
-        // Прокрутка годов колесиком мыши
         document.getElementById('yearsDropdown').addEventListener('wheel', function(event) {
             event.preventDefault();
             this.scrollTop += event.deltaY;
         });
 
-        // Авто-фокус на текущий день
         document.addEventListener('DOMContentLoaded', function() {
             const todayElement = document.querySelector('.day.today');
             if (todayElement) {

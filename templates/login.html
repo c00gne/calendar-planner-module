@@ -127,7 +127,6 @@
             border: 1px solid #f5c6cb;
         }
         
-        /* Стили для переключателя тем */
         .theme-switcher {
             position: fixed;
             bottom: 30px;
@@ -216,7 +215,6 @@
             }
         }
         
-        /* Классы для разных тем */
         .theme-purple {
             --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             --primary-color: #764ba2;
@@ -283,7 +281,6 @@
         </div>
     </div>
 
-    <!-- Переключатель тем -->
     <div class="theme-switcher">
         <button class="theme-btn" onclick="toggleThemeMenu()">🎨</button>
         <div class="theme-menu" id="themeMenu">
@@ -311,7 +308,6 @@
     </div>
 
     <script>
-        // Управление переключателем тем
         function toggleThemeMenu() {
             const menu = document.getElementById('themeMenu');
             menu.classList.toggle('show');
@@ -338,7 +334,6 @@
             }
         });
 
-        // Авто-скрытие flash сообщений
         setTimeout(function() {
             const flashMessages = document.querySelector('.flash-messages');
             if (flashMessages) {
