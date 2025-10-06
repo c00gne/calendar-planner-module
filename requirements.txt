@@ -1,1 +1,7 @@
 flask
+flask-login
+flask-mail
+flask-sqlalchemy
+itsdangerous
+email-validator
+werkzeug

@@ -46,5 +46,30 @@ def events_by_month(year, month):
         days.append({"day": d, "events": day_events})
     return render_template("month.html", year=year, month=month, days=days)
 
+
+@app.route("/edit/<int:event_id>")
+def edit_event_form(event_id):
+    event = manager.get_event_by_id(event_id)
+    return render_template("edit_event.html", event=event)
+
+@app.route("/edit/<int:event_id>", methods=["POST"])
+def edit_event(event_id):
+    event = manager.get_event_by_id(event_id)
+    if event:
+        event.title = request.form["title"]
+        event.description = request.form["description"]
+        event.date = datetime.strptime(request.form["date"], "%Y-%m-%d").date()
+    return redirect(url_for("events_by_day", date=event.date.strftime("%Y-%m-%d"), message="Подію оновлено!"))
+
+@app.route("/delete/<int:event_id>")
+def delete_event(event_id):
+    event = manager.get_event_by_id(event_id)
+    if event:
+        manager.delete_event(event_id)
+        return redirect(url_for("events_by_day", date=event.date.strftime("%Y-%m-%d"), message="Подію видалено!"))
+    return redirect(url_for("home"))
+
+
+
 if __name__ == "__main__":
     app.run(debug=True)
