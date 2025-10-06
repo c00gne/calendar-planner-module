@@ -1,17 +1,14 @@
-# Виртуальное окружение
 .venv
 venv/
 env/
 ENV/
 
-# Базы данных
 *.db
 *.sqlite
 *.sqlite3
 *.db-journal
 instance/
 
-# Файлы окружения
 .env
 .env.local
 .env.production
@@ -19,26 +16,22 @@ instance/
 .secret
 config_secret.py
 
-# Логи
 *.log
 logs/
 flask.log
 
-# Кэш Python
 __pycache__/
 *.py[cod]
 *$py.class
 *.so
 .Python
 
-# IDE
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
 
-# Операционные системы
 .DS_Store
 .DS_Store?
 ._*
@@ -47,31 +40,24 @@ __pycache__/
 ehthumbs.db
 Thumbs.db
 
-# Миграции базы данных (если будешь использовать Flask-Migrate)
 migrations/
 
-# Файлы сессий
 flask_session/
 
-# Временные файлы
 tmp/
 temp/
 *.tmp
 *.temp
 
-# Файлы кэша
 .cache
 .pytest_cache/
 .mypy_cache/
 
-# Jupyter Notebook
 .ipynb_checkpoints
 
-# Файлы сборки
 build/
 dist/
 *.egg-info/
 
-# Файлы операционной системы
 *.bak
 *.backup
