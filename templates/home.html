@@ -6,71 +6,180 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <style>
         body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            margin-top: 150px;
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            height: 100vh;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
         }
         .container {
             background: rgba(255, 255, 255, 0.1);
-            padding: 40px;
-            border-radius: 15px;
+            padding: 50px;
+            border-radius: 20px;
             backdrop-filter: blur(10px);
-            max-width: 500px;
-            margin: 0 auto;
+            max-width: 600px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+        }
+        .logo {
+            font-size: 4em;
+            margin-bottom: 20px;
+        }
+        h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        .subtitle {
+            font-size: 1.3em;
+            margin-bottom: 40px;
+            opacity: 0.9;
         }
         .btn {
-            padding: 15px 30px;
-            background: #fff;
-            color: #667eea;
+            padding: 18px 35px;
+            background: rgba(255, 255, 255, 0.9);
+            color: #764ba2;
             border: none;
-            border-radius: 25px;
+            border-radius: 30px;
             text-decoration: none;
             cursor: pointer;
-            font-size: 18px;
+            font-size: 1.2em;
             font-weight: bold;
-            margin: 20px 10px;
+            margin: 15px;
             display: inline-block;
-            transition: transform 0.3s;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            min-width: 200px;
         }
         .btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            background: white;
+        }
+        .btn-primary {
+            background: rgba(255, 255, 255, 0.95);
+            font-size: 1.3em;
+            padding: 20px 40px;
         }
         .auth-links {
-            margin-top: 30px;
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255,255,255,0.3);
         }
         .auth-links a {
             color: white;
-            margin: 0 10px;
+            margin: 0 15px;
             text-decoration: none;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
         }
         .auth-links a:hover {
             text-decoration: underline;
+            transform: translateY(-2px);
         }
-        h1 {
-            font-size: 2.5em;
+        .user-welcome {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 15px 25px;
+            border-radius: 25px;
             margin-bottom: 30px;
+            display: inline-block;
+        }
+        .features {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin: 40px 0;
+            flex-wrap: wrap;
+        }
+        .feature {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 15px;
+            min-width: 150px;
+        }
+        .feature-icon {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        .feature-text {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+        @media (max-width: 768px) {
+            .container {
+                padding: 30px 20px;
+            }
+            h1 {
+                font-size: 2.5em;
+            }
+            .btn {
+                display: block;
+                margin: 10px auto;
+                min-width: auto;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🏗️ Compact Planner</h1>
-        <p style="font-size: 1.2em; margin-bottom: 30px;">Організуйте ваші події та завдання</p>
+        <div class="logo">📅</div>
+        <h1>Compact Planner</h1>
+        <div class="subtitle">Організуйте ваші події та завдання</div>
         
         {% if current_user.is_authenticated %}
-            <a href="{{ url_for('select_view') }}" class="btn">🚀 ПОЧАТИ РОБОТУ</a>
+            <div class="user-welcome">
+                👋 Вітаємо, <strong>{{ current_user.username }}</strong>!
+            </div>
+            <!-- Если пользователь авторизован - кнопка "ПОЧАТИ РОБОТУ" -->
+            <a href="{{ url_for('current_month') }}" class="btn btn-primary">🚀 ПОЧАТИ РОБОТУ</a>
+            
+            <div class="features">
+                <div class="feature">
+                    <div class="feature-icon">📝</div>
+                    <div class="feature-text">Створюйте події</div>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">📅</div>
+                    <div class="feature-text">Плануйте день</div>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">🔔</div>
+                    <div class="feature-text">Не пропускайте</div>
+                </div>
+            </div>
+            
             <div class="auth-links">
-                <span>Welcome, {{ current_user.username }}!</span>
-                <a href="{{ url_for('logout') }}">Вийти</a>
+                <a href="{{ url_for('logout') }}">🚪 Вийти з акаунту</a>
             </div>
         {% else %}
-            <p style="margin-bottom: 30px;">Увійдіть або зареєструйтесь для початку роботи</p>
-            <a href="{{ url_for('login') }}" class="btn">🔑 Увійти</a>
+            <!-- Если не авторизован - предложение войти/зарегистрироваться -->
+            <div class="features">
+                <div class="feature">
+                    <div class="feature-icon">🔐</div>
+                    <div class="feature-text">Безпечний вхід</div>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">⚡</div>
+                    <div class="feature-text">Швидкий старт</div>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">🎯</div>
+                    <div class="feature-text">Простий інтерфейс</div>
+                </div>
+            </div>
+            
+            <a href="{{ url_for('login') }}" class="btn">🔑 Увійти в акаунт</a>
             <a href="{{ url_for('register') }}" class="btn">📝 Зареєструватись</a>
+            
+            <div class="auth-links">
+                <p>Починайте планувати ваш день вже зараз!</p>
+            </div>
         {% endif %}
     </div>
 </body>

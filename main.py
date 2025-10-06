@@ -9,7 +9,7 @@ from config import Config
 app = Flask(__name__)
 app.config.from_object(Config)
 
-# екстенши
+# Инициализация расширений
 db.init_app(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -26,12 +26,73 @@ def home():
     """Главная страница с приветствием"""
     return render_template("home.html")
 
-# аутент
-@app.route("/login", methods=['GET', 'POST'])
+@app.route("/current-month")
+@login_required
+def current_month():
+    """Перенаправляет на текущий месяц"""
+    now = datetime.now()
+    return redirect(url_for('events_by_month', year=now.year, month=now.month))
+
+@app.route("/month/<int:year>/<int:month>")
+@login_required
+def events_by_month(year, month):
+    events = manager.get_events_by_month(year, month)
+    
+    # Создаем календарь на месяц
+    cal = calendar.Calendar(firstweekday=0)  # Понедельник первый день
+    month_days = cal.monthdayscalendar(year, month)
+    
+    # Название месяца
+    month_names = ['', 'Січень', 'Лютий', 'Березень', 'Квітень', 'Травень', 'Червень',
+                   'Липень', 'Серпень', 'Вересень', 'Жовтень', 'Листопад', 'Грудень']
+    month_name = month_names[month]
+    
+    # Текущая дата
+    today = datetime.now().date()
+    
+    # Формируем дни для отображения
+    days = []
+    for week in month_days:
+        for day_num in week:
+            if day_num != 0:  # Игнорируем пустые дни (другие месяцы)
+                day_date = date(year, month, day_num)
+                day_events = [e for e in events if e.date == day_date]
+                is_today = (day_date == today)
+                is_current_month = True
+                
+                days.append({
+                    'day': day_num,
+                    'events': day_events,
+                    'is_today': is_today,
+                    'is_current_month': is_current_month,
+                    'full_date': day_date.strftime('%Y-%m-%d')
+                })
+            else:
+                # Добавляем пустые дни для выравнивания
+                days.append({
+                    'day': '',
+                    'events': [],
+                    'is_today': False,
+                    'is_current_month': False,
+                    'full_date': ''
+                })
+    
+    years = list(range(2020, 2031))
+    
+    return render_template("month.html", 
+                         year=year, 
+                         month=month,
+                         month_name=month_name,
+                         days=days,
+                         years=years,
+                         today=today)
+
+# Аутентификация
+@app.route('/login', methods=['GET', 'POST'])
 def login():
     """Страница входа"""
     if current_user.is_authenticated:
-        return redirect(url_for('select_view'))  # рерут на выбор месяца если уже авторизован
+        return redirect(url_for('current_month'))  # Перенаправляем на текущий месяц
     
     if request.method == 'POST':
         username = request.form['username']
@@ -40,7 +101,7 @@ def login():
         
         if user and user.check_password(password):
             login_user(user)
-            return redirect(url_for('select_view'))  # логаут - на выбор месяца
+            return redirect(url_for('current_month'))  # После входа - на текущий месяц
     
     return render_template('login.html')
 
@@ -48,7 +109,7 @@ def login():
 def register():
     """Страница регистрации"""
     if current_user.is_authenticated:
-        return redirect(url_for('select_view'))  # тоже на выбор месяца если уже залогинен
+        return redirect(url_for('current_month'))  # Если уже авторизован - на текущий месяц
     
     if request.method == 'POST':
         username = request.form['username']
@@ -65,7 +126,7 @@ def register():
         db.session.commit()
         
         login_user(user)
-        return redirect(url_for('select_view'))  # после регистра на выбор месяца
+        return redirect(url_for('current_month'))  # После регистрации - на текущий месяц
     
     return render_template('register.html')
 
@@ -74,20 +135,7 @@ def logout():
     logout_user()
     return redirect(url_for('home'))
 
-@app.route("/select")
-@login_required
-def select_view():
-    now = datetime.now()
-    years = list(range(2020, 2031))
-    months = [
-        (1, 'Січень'), (2, 'Лютий'), (3, 'Березень'), 
-        (4, 'Квітень'), (5, 'Травень'), (6, 'Червень'),
-        (7, 'Липень'), (8, 'Серпень'), (9, 'Вересень'),
-        (10, 'Жовтень'), (11, 'Листопад'), (12, 'Грудень')
-    ]
-    return render_template("select.html", years=years, months=months, now=now)
-
-# маршруты защищены логином
+# Маршруты для событий
 @app.route("/day/<date>")
 @login_required
 def events_by_day(date):
@@ -114,18 +162,6 @@ def add_event():
     if request.referrer and "/add/" in request.referrer:
         return redirect(url_for("events_by_day", date=event_date.strftime("%Y-%m-%d"), message="Подію додано!"))
     return redirect(url_for("events_by_month", year=event_date.year, month=event_date.month))
-
-@app.route("/month/<int:year>/<int:month>")
-@login_required
-def events_by_month(year, month):
-    events = manager.get_events_by_month(year, month)
-    num_days = calendar.monthrange(year, month)[1]
-    days = []
-    for d in range(1, num_days + 1):
-        day_date = date(year, month, d)
-        day_events = [e for e in events if e.date == day_date]
-        days.append({"day": d, "events": day_events})
-    return render_template("month.html", year=year, month=month, days=days)
 
 @app.route("/edit/<int:event_id>")
 @login_required

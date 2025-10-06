@@ -2,7 +2,7 @@
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
-    <title>Календар на місяць - Compact Planner</title>
+    <title>Календар - Compact Planner</title>
     <style>
         body { 
             font-family: 'Arial', sans-serif; 
@@ -21,6 +21,7 @@
             padding: 10px 15px;
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            z-index: 1000;
         }
         .user-info a {
             margin-left: 10px;
@@ -32,29 +33,112 @@
             text-decoration: underline;
         }
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
             padding: 80px 20px 20px;
         }
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-            color: white;
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px 30px;
+            border-radius: 15px 15px 0 0;
+            margin-bottom: 0;
         }
-        .header h1 {
-            font-size: 2.5em;
+        .nav-btn {
+            background: #764ba2;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .nav-btn:hover {
+            background: #667eea;
+            transform: scale(1.1);
+        }
+        .month-title {
+            font-size: 2em;
+            color: #764ba2;
+            font-weight: bold;
             margin: 0;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        .year-selector {
+            position: relative;
+        }
+        .year-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        .year-btn:hover {
+            background: #764ba2;
+        }
+        .years-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            max-height: 200px;
+            overflow-y: auto;
+            display: none;
+            z-index: 1000;
+            width: 120px;
+        }
+        .years-dropdown.show {
+            display: block;
+        }
+        .year-option {
+            padding: 10px 15px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .year-option:hover {
+            background: #f0f4ff;
+            color: #764ba2;
+        }
+        .year-option.current {
+            background: #667eea;
+            color: white;
+            font-weight: bold;
+        }
+        .week-days {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 15px 20px;
+            font-weight: bold;
+            color: #764ba2;
+        }
+        .week-day {
+            text-align: center;
+            padding: 10px;
         }
         .calendar { 
             display: grid; 
             grid-template-columns: repeat(7, 1fr); 
-            gap: 10px; 
+            gap: 8px; 
             background: rgba(255, 255, 255, 0.95);
             padding: 20px;
-            border-radius: 15px;
+            border-radius: 0 0 15px 15px;
             box-shadow: 0 8px 32px rgba(0,0,0,0.1);
-            backdrop-filter: blur(10px);
+            min-height: 600px;
         }
         .day { 
             border: 2px solid #e0e0e0; 
@@ -70,11 +154,23 @@
             box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
             border-color: #667eea;
         }
+        .day.today {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: #667eea;
+        }
+        .day.other-month {
+            background: #f8f9fa;
+            color: #999;
+        }
         .day h4 { 
             margin: 0 0 10px 0; 
             font-size: 16px; 
             color: #764ba2;
             font-weight: bold;
+        }
+        .day.today h4 {
+            color: white;
         }
         .day ul { 
             margin: 5px 0 0 0; 
@@ -88,6 +184,13 @@
             padding: 3px 6px;
             border-radius: 4px;
             border-left: 3px solid #667eea;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .day.today li {
+            background: rgba(255, 255, 255, 0.2);
+            border-left-color: white;
         }
         .add-btn { 
             position: absolute; 
@@ -98,6 +201,13 @@
             cursor: pointer;
             text-decoration: none;
             font-weight: bold;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 5px;
+            border-radius: 5px;
+        }
+        .day.today .add-btn {
+            color: white;
+            background: rgba(255, 255, 255, 0.2);
         }
         .day-btn { 
             position: absolute; 
@@ -131,10 +241,26 @@
             background: #764ba2;
             color: white;
         }
-        .month-year {
-            font-size: 1.2em;
+        .events-count {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            background: #667eea;
             color: white;
-            margin-top: 10px;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .day.today .events-count {
+            background: white;
+            color: #667eea;
+        }
+        .empty-day {
+            visibility: hidden;
         }
     </style>
 </head>
@@ -147,30 +273,124 @@
     </div>
 
     <div class="container">
-        <div class="header">
-            <h1>📅 Календар</h1>
-            <div class="month-year">{{ month }} / {{ year }}</div>
+        <!-- Шапка календаря с навигацией -->
+        <div class="calendar-header">
+            <button class="nav-btn" onclick="navigateMonth(-1)">‹</button>
+            
+            <div class="month-info">
+                <h1 class="month-title">{{ month_name }} {{ year }}</h1>
+            </div>
+            
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <div class="year-selector">
+                    <button class="year-btn" onclick="toggleYears()">{{ year }} ▾</button>
+                    <div class="years-dropdown" id="yearsDropdown">
+                        {% for y in years %}
+                            <div class="year-option {% if y == year %}current{% endif %}" 
+                                 onclick="selectYear({{ y }})">
+                                {{ y }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <button class="nav-btn" onclick="navigateMonth(1)">›</button>
+            </div>
         </div>
 
+        <!-- Дни недели -->
+        <div class="week-days">
+            <div class="week-day">Пн</div>
+            <div class="week-day">Вт</div>
+            <div class="week-day">Ср</div>
+            <div class="week-day">Чт</div>
+            <div class="week-day">Пт</div>
+            <div class="week-day">Сб</div>
+            <div class="week-day">Нд</div>
+        </div>
+
+        <!-- Сетка календаря -->
         <div class="calendar">
             {% for day in days %}
-            <div class="day">
-                <h4>{{ day.day }}</h4>
-                <ul>
-                    {% for e in day.events %}
-                    <li title="{{ e.description }}">{{ e.title }}</li>
-                    {% endfor %}
-                </ul>
-                <a href="{{ url_for('add_event_form', date='%04d-%02d-%02d' % (year, month, day.day)) }}" class="add-btn">➕ Додати</a>
-                <a href="{{ url_for('events_by_day', date='%04d-%02d-%02d' % (year, month, day.day)) }}" class="day-btn">📖 День</a>
-            </div>
+                {% if day.day %}
+                    <div class="day {% if day.is_today %}today{% endif %} {% if not day.is_current_month %}other-month{% endif %}"
+                         data-date="{{ day.full_date }}">
+                        <h4>{{ day.day }}</h4>
+                        <ul>
+                            {% for e in day.events %}
+                            <li title="{{ e.description }}">{{ e.title }}</li>
+                            {% endfor %}
+                        </ul>
+                        {% if day.events %}
+                        <div class="events-count">{{ day.events|length }}</div>
+                        {% endif %}
+                        <a href="{{ url_for('add_event_form', date=day.full_date) }}" class="add-btn">➕</a>
+                        <a href="{{ url_for('events_by_day', date=day.full_date) }}" class="day-btn">📖</a>
+                    </div>
+                {% else %}
+                    <div class="day empty-day"></div>
+                {% endif %}
             {% endfor %}
         </div>
 
         <div class="navigation">
-            <a href="{{ url_for('select_view') }}" class="btn">🔙 Вибрати інший місяць</a>
             <a href="{{ url_for('home') }}" class="btn">🏠 На головну</a>
         </div>
     </div>
+
+    <script>
+        // Навигация по месяцам
+        function navigateMonth(direction) {
+            const currentYear = {{ year }};
+            const currentMonth = {{ month }};
+            
+            let newYear = currentYear;
+            let newMonth = currentMonth + direction;
+            
+            if (newMonth > 12) {
+                newMonth = 1;
+                newYear++;
+            } else if (newMonth < 1) {
+                newMonth = 12;
+                newYear--;
+            }
+            
+            window.location.href = `/month/${newYear}/${newMonth}`;
+        }
+
+        // Управление выбором года
+        function toggleYears() {
+            const dropdown = document.getElementById('yearsDropdown');
+            dropdown.classList.toggle('show');
+        }
+
+        function selectYear(year) {
+            const currentMonth = {{ month }};
+            window.location.href = `/month/${year}/${currentMonth}`;
+        }
+
+        // Закрыть dropdown при клике вне его
+        document.addEventListener('click', function(event) {
+            const dropdown = document.getElementById('yearsDropdown');
+            const yearBtn = document.querySelector('.year-btn');
+            
+            if (!yearBtn.contains(event.target) && !dropdown.contains(event.target)) {
+                dropdown.classList.remove('show');
+            }
+        });
+
+        // Прокрутка годов колесиком мыши
+        document.getElementById('yearsDropdown').addEventListener('wheel', function(event) {
+            event.preventDefault();
+            this.scrollTop += event.deltaY;
+        });
+
+        // Авто-фокус на текущий день
+        document.addEventListener('DOMContentLoaded', function() {
+            const todayElement = document.querySelector('.day.today');
+            if (todayElement) {
+                todayElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        });
+    </script>
 </body>
 </html>
