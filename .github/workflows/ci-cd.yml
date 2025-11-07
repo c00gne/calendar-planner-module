@@ -30,7 +30,7 @@ jobs:
         
     - name: Validate files
       run: |
-        echo "📁 Checking project structure..."
+        echo "Checking project structure"
         ls -la
         [ -f "main.py" ] && echo "✅ main.py exists" || exit 1
         [ -f "models.py" ] && echo "✅ models.py exists" || exit 1
@@ -38,4 +38,4 @@ jobs:
         
     - name: Build success
       run: |
-        echo "🎉 CI/CD Pipeline completed successfully!"
+        echo "CI/CD Pipeline completed successfully ++++"
