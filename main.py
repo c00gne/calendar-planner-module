@@ -4,6 +4,9 @@ import calendar
 from flask_login import LoginManager, current_user, login_user, logout_user, login_required
 from models import db, User, Event
 from config import Config
+from analytics import Analytics
+
+Analytics.log("Flask app started")
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -130,6 +133,7 @@ def login():
         
         if user and user.check_password(password):
             login_user(user)
+            Analytics.log(f"User logged in: {user.username}")
             flash('Вітаємо! Ви успішно увійшли в систему.', 'success')
             return redirect(url_for('current_month'))
         else:
@@ -161,6 +165,7 @@ def register():
         db.session.commit()
         
         login_user(user)
+        Analytics.log(f"New user registered: {username}")
         flash('Вітаємо! Ваш акаунт успішно створено.', 'success')
         return redirect(url_for('current_month'))
     
@@ -169,6 +174,7 @@ def register():
 @app.route('/logout')
 @login_required
 def logout():
+    Analytics.log(f"User logged out: {current_user.username}")
     logout_user()
     flash('Ви успішно вийшли з системи.', 'info')
     return redirect(url_for('home'))
@@ -201,9 +207,10 @@ def add_event():
         description=desc,
         user_id=current_user.id
     )
-    
     db.session.add(event)
     db.session.commit()
+    Analytics.log(f"User {current_user.username} added event: {title} on {event_date}")
+
     
     flash('Подію успішно додано!', 'success')
     
@@ -227,8 +234,8 @@ def edit_event(event_id):
         event.description = request.form["description"]
         event.date = datetime.strptime(request.form["date"], "%Y-%m-%d").date()
         db.session.commit()
+        Analytics.log(f"User {current_user.username} edited event #{event.id}")
         flash('Подію успішно оновлено!', 'success')
-    
     return redirect(url_for("events_by_day", date=event.date.strftime("%Y-%m-%d")))
 
 @app.route("/delete/<int:event_id>")
@@ -238,6 +245,7 @@ def delete_event(event_id):
     
     if event:
         event_date = event.date
+        Analytics.log(f"User {current_user.username} deleted event #{event.id}")
         db.session.delete(event)
         db.session.commit()
         flash('Подію успішно видалено!', 'success')
@@ -247,5 +255,20 @@ def delete_event(event_id):
 
 if __name__ == "__main__":
     with app.app_context():
-        db.create_all()
-    app.run(debug=True)
+         db.create_all()
+    
+    try:
+        app.run(debug=True)
+    except KeyboardInterrupt:
+        Analytics.log("Flask app shutdown (KeyboardInterrupt)")
+    finally:
+        Analytics.log("Flask app shutdown")
+
+
+
+
+
+
+
+
+    
