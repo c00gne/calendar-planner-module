@@ -253,6 +253,95 @@ def delete_event(event_id):
     
     return redirect(url_for("home"))
 
+# === ДОПОМІЖНА ФУНКЦІЯ ДЛЯ РОЗРАХУНКУ ДАТ ===
+def add_months(source_date, months):
+    month = source_date.month - 1 + months
+    year = source_date.year + month // 12
+    month = month % 12 + 1
+    day = min(source_date.day, calendar.monthrange(year, month)[1])
+    return date(year, month, day)
+
+# === ЛОГІКА СТВОРЕННЯ ДОГОВОРУ (ТИЖДЕНЬ 2) ===
+@app.route("/add_contract", methods=["GET", "POST"])
+@login_required
+def add_contract():
+    if request.method == "POST":
+        # 1. Отримуємо дані з форми
+        number = request.form["number"]
+        client = request.form["client"]
+        amount = float(request.form["amount"])
+        start_date_str = request.form["start_date"]
+        duration = int(request.form["duration"])
+        
+        start_date = datetime.strptime(start_date_str, "%Y-%m-%d").date()
+
+        # 2. Створюємо сам договір в базі
+        contract = Contract(
+            number=number,
+            client_name=client,
+            amount=amount,
+            start_date=start_date,
+            duration_months=duration,
+            user_id=current_user.id
+        )
+        db.session.add(contract)
+        db.session.flush() # Це важливо! Щоб отримати contract.id до commit
+
+        # 3. МАГІЯ: Генерація графіку платежів
+        monthly_payment = amount / duration # Простий розрахунок платежу
+        
+        for i in range(duration):
+            # Розрахунок дати наступного платежу
+            payment_date = add_months(start_date, i)
+            
+            # Створення події-платежу
+            event = Event(
+                title=f"Платіж: {client} ({i+1}/{duration})",
+                description=f"Сума: {monthly_payment:.2f} грн. Договір №{number}. Внесок {i+1} з {duration}",
+                date=payment_date,
+                user_id=current_user.id,
+                priority='high',      # Автоматично ставимо високий пріоритет
+                event_type='payment', # Позначаємо як платіж
+                contract_id=contract.id
+            )
+            db.session.add(event)
+
+        db.session.commit()
+        Analytics.log(f"User {current_user.username} created contract {number} with {duration} auto-events")
+        
+        flash(f'Договір створено! Графік платежів на {duration} міс. згенеровано.', 'success')
+        return redirect(url_for('current_month'))
+
+    return render_template("add_contract.html")
+
+# === АНУЛЮВАННЯ ДОГОВОРУ ===
+@app.route("/cancel_contract", methods=["GET", "POST"])
+@login_required
+def cancel_contract():
+    if request.method == "POST":
+        query = request.form["query"].strip() # Отримуємо текст
+        
+        # Шукаємо договір за номером АБО назвою клієнта
+        contract = Contract.query.filter(
+            (Contract.user_id == current_user.id) & 
+            ((Contract.number == query) | (Contract.client_name == query))
+        ).first()
+
+        if contract:
+            deleted_info = f"{contract.number} ({contract.client_name})"
+            
+            # Видаляємо договір -> база сама видалить всі події (Cascade)
+            db.session.delete(contract)
+            db.session.commit()
+            
+            Analytics.log(f"User {current_user.username} cancelled contract: {deleted_info}")
+            flash(f'Договір {deleted_info} успішно розірвано. Всі події видалено.', 'warning')
+            return redirect(url_for('current_month'))
+        else:
+            flash(f'Договір за запитом "{query}" не знайдено. Перевірте назву.', 'danger')
+
+    return render_template("cancel_contract.html")
+
 if __name__ == "__main__":
     with app.app_context():
          db.create_all()

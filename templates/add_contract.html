@@ -1,0 +1,42 @@
+{% extends "home.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Новий лізинговий договір</h2>
+    <form action="{{ url_for('add_contract') }}" method="POST">
+        
+        <div class="mb-3">
+            <label for="number" class="form-label">Номер договору</label>
+            <input type="text" class="form-control" name="number" placeholder="Наприклад: ЛЗ-2026/01" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="client" class="form-label">Клієнт (ПІБ або Назва компанії)</label>
+            <input type="text" class="form-control" name="client" placeholder="ТОВ Роги та Копита" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="amount" class="form-label">Загальна сума (грн)</label>
+            <input type="number" step="0.01" class="form-control" name="amount" placeholder="100000" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="start_date" class="form-label">Дата початку (перший платіж)</label>
+            <input type="date" class="form-control" name="start_date" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="duration" class="form-label">Термін (місяців)</label>
+            <select class="form-control" name="duration">
+                <option value="6">6 місяців</option>
+                <option value="12" selected>12 місяців (1 рік)</option>
+                <option value="24">24 місяці (2 роки)</option>
+                <option value="36">36 місяців (3 роки)</option>
+            </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Зберегти та згенерувати графік</button>
+        <a href="{{ url_for('current_month') }}" class="btn btn-secondary">Скасувати</a>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,27 @@
+{% extends "home.html" %}
+
+{% block content %}
+<div class="container mt-4" style="border: 2px solid #ff6b6b; background: rgba(50, 0, 0, 0.3); padding: 30px; border-radius: 15px;">
+    <h2 style="color: #ff6b6b; margin-bottom: 20px;">⚠️ Розірвання договору</h2>
+    <p style="font-size: 1.1em; margin-bottom: 30px;">
+        Увага! Ця дія <strong>незворотна</strong>. Всі заплановані платежі за цим договором будуть видалені з календаря автоматично.
+    </p>
+    
+    <form action="{{ url_for('cancel_contract') }}" method="POST">
+        
+        <div class="mb-3" style="text-align: left;">
+            <label for="query" class="form-label">Введіть Номер договору або Назву клієнта</label>
+            <input type="text" class="form-control" name="query" placeholder="Наприклад: ТОВ МУЖІЧКІ" required style="font-size: 1.2em; padding: 10px;">
+        </div>
+
+        <div style="display: flex; gap: 15px; margin-top: 30px;">
+            <button type="submit" class="btn" style="background: #ff6b6b; color: white; flex: 1; font-size: 1.2em; border: none; padding: 15px; border-radius: 30px; cursor: pointer;">
+                🔥 Анулювати Договір 🔥
+            </button>
+            <a href="{{ url_for('current_month') }}" class="btn" style="background: white; color: #333; flex: 1; text-decoration: none; display: flex; align-items: center; justify-content: center; border-radius: 30px;">
+                Скасувати
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}

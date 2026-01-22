@@ -192,6 +192,24 @@
             background: rgba(255, 255, 255, 0.2);
             border-left-color: white;
         }
+
+        /* --- СТИЛІ ДЛЯ ПРІОРИТЕТІВ --- */
+        li.priority-high {
+            background-color: #ff6b6b !important; /* Червоний для платежів */
+            color: white !important;
+            border-left: 3px solid #c92a2a !important;
+        }
+        li.priority-medium {
+            background-color: #fcc419 !important; /* Жовтий для зустрічей */
+            color: #333 !important;
+            border-left: 3px solid #e67700 !important;
+        }
+        li.priority-low {
+            background-color: #dee2e6 !important; /* Сірий для рутини */
+            color: #333 !important;
+            border-left: 3px solid #adb5bd !important;
+        }
+
         .add-btn { 
             position: absolute; 
             bottom: 10px; 
@@ -263,10 +281,18 @@
             visibility: hidden;
         }
         
+        /* --- ПАНЕЛЬ КНОПОК --- */
+        .bottom-toolbar {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
         .upcoming-events {
             position: relative;
             display: inline-block;
-            margin-top: 20px;
         }
         
         .btn-upcoming {
@@ -279,11 +305,56 @@
             cursor: pointer;
             transition: all 0.3s ease;
             box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            text-decoration: none;
+            display: inline-block;
+            font-size: 14px;
+            font-family: Arial, sans-serif;
         }
         
         .btn-upcoming:hover {
             transform: translateY(-3px);
             box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
+        }
+
+        .btn-success {
+            padding: 12px 25px;
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            color: #2c3e50;
+            border: none;
+            border-radius: 25px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(67, 233, 123, 0.4);
+            text-decoration: none;
+            display: inline-block;
+            font-size: 14px;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(67, 233, 123, 0.6);
+        }
+
+        .btn-danger {
+            padding: 12px 25px;
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+            text-decoration: none;
+            display: inline-block;
+            font-size: 14px;
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.5);
+            background: #fa5252;
         }
         
         .upcoming-dropdown {
@@ -564,7 +635,9 @@
                         <h4>{{ day.day }}</h4>
                         <ul>
                             {% for e in day.events %}
-                            <li title="{{ e.description }}">{{ e.title }}</li>
+                            <li class="priority-{{ e.priority|default('medium') }}" title="{{ e.description }}">
+                                {{ e.title }}
+                            </li>
                             {% endfor %}
                         </ul>
                         {% if day.events %}
@@ -583,52 +656,61 @@
             <a href="{{ url_for('home') }}" class="btn">🏠 На головну</a>
         </div>
 
-        <div class="upcoming-events">
-            <button class="btn-upcoming" onclick="toggleUpcoming()">📅 Найближчі події</button>
-            <div class="upcoming-dropdown" id="upcomingDropdown">
-                <div class="upcoming-section">
-                    <h4>🗓️ На цьому тижні</h4>
-                    <div class="events-list">
-                        {% for event in upcoming_week %}
-                        <div class="upcoming-event">
-                            <span class="event-date">{{ event.date.strftime('%d.%m') }}</span>
-                            <span class="event-title">{{ event.title }}</span>
+        <div class="bottom-toolbar">
+            
+            <a href="{{ url_for('add_contract') }}" class="btn-success">➕ Новий Договір</a>
+
+            <div class="upcoming-events">
+                <button class="btn-upcoming" onclick="toggleUpcoming()">📅 Найближчі події</button>
+                <div class="upcoming-dropdown" id="upcomingDropdown">
+                    <div class="upcoming-section">
+                        <h4>🗓️ На цьому тижні</h4>
+                        <div class="events-list">
+                            {% for event in upcoming_week %}
+                            <div class="upcoming-event">
+                                <span class="event-date">{{ event.date.strftime('%d.%m') }}</span>
+                                <span class="event-title">{{ event.title }}</span>
+                            </div>
+                            {% else %}
+                            <div class="no-events">Немає подій</div>
+                            {% endfor %}
                         </div>
-                        {% else %}
-                        <div class="no-events">Немає подій</div>
-                        {% endfor %}
                     </div>
-                </div>
-                
-                <div class="upcoming-section">
-                    <h4>📋 На наступному тижні</h4>
-                    <div class="events-list">
-                        {% for event in upcoming_next_week %}
-                        <div class="upcoming-event">
-                            <span class="event-date">{{ event.date.strftime('%d.%m') }}</span>
-                            <span class="event-title">{{ event.title }}</span>
+                    
+                    <div class="upcoming-section">
+                        <h4>📋 На наступному тижні</h4>
+                        <div class="events-list">
+                            {% for event in upcoming_next_week %}
+                            <div class="upcoming-event">
+                                <span class="event-date">{{ event.date.strftime('%d.%m') }}</span>
+                                <span class="event-title">{{ event.title }}</span>
+                            </div>
+                            {% else %}
+                            <div class="no-events">Немає подій</div>
+                            {% endfor %}
                         </div>
-                        {% else %}
-                        <div class="no-events">Немає подій</div>
-                        {% endfor %}
                     </div>
-                </div>
-                
-                <div class="upcoming-section">
-                    <h4>📅 На цьому місяці</h4>
-                    <div class="events-list">
-                        {% for event in upcoming_month %}
-                        <div class="upcoming-event">
-                            <span class="event-date">{{ event.date.strftime('%d.%m') }}</span>
-                            <span class="event-title">{{ event.title }}</span>
+                    
+                    <div class="upcoming-section">
+                        <h4>📅 На цьому місяці</h4>
+                        <div class="events-list">
+                            {% for event in upcoming_month %}
+                            <div class="upcoming-event">
+                                <span class="event-date">{{ event.date.strftime('%d.%m') }}</span>
+                                <span class="event-title">{{ event.title }}</span>
+                            </div>
+                            {% else %}
+                            <div class="no-events">Немає подій</div>
+                            {% endfor %}
                         </div>
-                        {% else %}
-                        <div class="no-events">Немає подій</div>
-                        {% endfor %}
                     </div>
                 </div>
             </div>
+
+            <a href="{{ url_for('cancel_contract') }}" class="btn-danger">❌ Анулювати договір</a>
+        
         </div>
+
     </div>
 
     <div class="theme-switcher">
