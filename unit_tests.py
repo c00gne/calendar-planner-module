@@ -8,7 +8,17 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from main import app, db
 from models import User, Event, Contract
-from config import Config
+# для гітхаб екшенс
+try:
+    from config import Config
+except ImportError:
+    # Заглушка для GitHub Actions
+    class Config:
+        SECRET_KEY = 'test-secret'
+        SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
+        WTF_CSRF_ENABLED = False
+        MAIL_SUPPRESS_SEND = True
+# для гітхаб екшенс
 
 # === КОНФІГУРАЦІЯ ДЛЯ ТЕСТІВ ===
 class TestConfig(Config):
