@@ -15,6 +15,7 @@ instance/
 .env.development
 .secret
 config_secret.py
+config.py
 
 *.log
 logs/
