@@ -60,7 +60,8 @@
             font-weight: bold;
             color: var(--primary-color);
         }
-        .form-group input, .form-group textarea {
+        /* Стилізуємо select так само як input */
+        .form-group input, .form-group textarea, .form-group select {
             width: 100%;
             padding: 12px;
             border: 2px solid #e0e0e0;
@@ -68,8 +69,9 @@
             font-size: 16px;
             transition: border-color 0.3s ease;
             box-sizing: border-box;
+            background: white; /* Важливо для select */
         }
-        .form-group input:focus, .form-group textarea:focus {
+        .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
             outline: none;
             border-color: var(--secondary-color);
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
@@ -94,6 +96,10 @@
         }
         .btn-secondary {
             background: #6c757d;
+            text-align: center;
+            display: block; 
+            text-decoration: none;
+            box-sizing: border-box; 
         }
         .btn-secondary:hover {
             background: #545b62;
@@ -106,125 +112,23 @@
             font-weight: bold;
         }
         
+        .theme-switcher { position: fixed; bottom: 30px; right: 30px; z-index: 1000; }
+        .theme-btn { width: 60px; height: 60px; border-radius: 50%; background: var(--primary-gradient); border: none; color: white; font-size: 24px; cursor: pointer; box-shadow: 0 4px 20px rgba(0,0,0,0.3); transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; }
+        .theme-btn:hover { transform: scale(1.1) rotate(15deg); box-shadow: 0 6px 25px rgba(0,0,0,0.4); }
+        .theme-menu { display: none; position: absolute; bottom: 70px; right: 0; background: white; border-radius: 15px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); padding: 15px; min-width: 150px; animation: slideUp 0.3s ease; }
+        .theme-menu.show { display: block; }
+        .theme-option { display: flex; align-items: center; padding: 10px; cursor: pointer; border-radius: 8px; transition: background 0.3s ease; margin-bottom: 5px; }
+        .theme-option:last-child { margin-bottom: 0; }
+        .theme-option:hover { background: #f8f9fa; }
+        .theme-color { width: 20px; height: 20px; border-radius: 50%; margin-right: 10px; border: 2px solid #f0f0f0; }
+        .theme-option span { color: #333; font-size: 14px; font-weight: 500; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
-        .theme-switcher {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            z-index: 1000;
-        }
-        
-        .theme-btn {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: var(--primary-gradient);
-            border: none;
-            color: white;
-            font-size: 24px;
-            cursor: pointer;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .theme-btn:hover {
-            transform: scale(1.1) rotate(15deg);
-            box-shadow: 0 6px 25px rgba(0,0,0,0.4);
-        }
-        
-        .theme-menu {
-            display: none;
-            position: absolute;
-            bottom: 70px;
-            right: 0;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-            padding: 15px;
-            min-width: 150px;
-            animation: slideUp 0.3s ease;
-        }
-        
-        .theme-menu.show {
-            display: block;
-        }
-        
-        .theme-option {
-            display: flex;
-            align-items: center;
-            padding: 10px;
-            cursor: pointer;
-            border-radius: 8px;
-            transition: background 0.3s ease;
-            margin-bottom: 5px;
-        }
-        
-        .theme-option:last-child {
-            margin-bottom: 0;
-        }
-        
-        .theme-option:hover {
-            background: #f8f9fa;
-        }
-        
-        .theme-color {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            margin-right: 10px;
-            border: 2px solid #f0f0f0;
-        }
-        
-        .theme-option span {
-            color: #333;
-            font-size: 14px;
-            font-weight: 500;
-        }
-        
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        
-        .theme-purple {
-            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --primary-color: #764ba2;
-            --secondary-color: #667eea;
-        }
-        
-        .theme-orange {
-            --primary-gradient: linear-gradient(135deg, #ff7e5f 0%, #feb47b 100%);
-            --primary-color: #ff7e5f;
-            --secondary-color: #feb47b;
-        }
-        
-        .theme-blue {
-            --primary-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-            --primary-color: #4facfe;
-            --secondary-color: #00f2fe;
-        }
-        
-        .theme-green {
-            --primary-gradient: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
-            --primary-color: #43e97b;
-            --secondary-color: #38f9d7;
-        }
-        
-        .theme-dark {
-            --primary-gradient: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
-            --primary-color: #2c3e50;
-            --secondary-color: #3498db;
-        }
+        .theme-purple { --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%); --primary-color: #764ba2; --secondary-color: #667eea; }
+        .theme-orange { --primary-gradient: linear-gradient(135deg, #ff7e5f 0%, #feb47b 100%); --primary-color: #ff7e5f; --secondary-color: #feb47b; }
+        .theme-blue { --primary-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); --primary-color: #4facfe; --secondary-color: #00f2fe; }
+        .theme-green { --primary-gradient: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); --primary-color: #43e97b; --secondary-color: #38f9d7; }
+        .theme-dark { --primary-gradient: linear-gradient(135deg, #2c3e50 0%, #3498db 100%); --primary-color: #2c3e50; --secondary-color: #3498db; }
     </style>
 </head>
 <body>
@@ -249,7 +153,15 @@
                     <label for="title">Назва події *</label>
                     <input type="text" id="title" name="title" placeholder="Введіть назву події" required>
                 </div>
-                
+
+                <div class="form-group">
+                    <label for="priority">Важливість (Колір)</label>
+                    <select id="priority" name="priority">
+                        <option value="medium" selected>🔵 Звичайна (Блакитна)</option>
+                        <option value="high">🔴 Важлива (Червона)</option>
+                        <option value="low">⚪ Рутина (Сіра)</option>
+                    </select>
+                </div>
                 <div class="form-group">
                     <label for="description">Опис події</label>
                     <input type="text" id="description" name="description" placeholder="Введіть опис (необов'язково)">
@@ -262,64 +174,22 @@
         </div>
     </div>
 
-    
     <div class="theme-switcher">
         <button class="theme-btn" onclick="toggleThemeMenu()">🎨</button>
         <div class="theme-menu" id="themeMenu">
-            <div class="theme-option" data-theme="purple" onclick="changeTheme('purple')">
-                <div class="theme-color" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%)"></div>
-                <span>Фіолетова</span>
-            </div>
-            <div class="theme-option" data-theme="orange" onclick="changeTheme('orange')">
-                <div class="theme-color" style="background: linear-gradient(135deg, #ff7e5f 0%, #feb47b 100%)"></div>
-                <span>Оранжева</span>
-            </div>
-            <div class="theme-option" data-theme="blue" onclick="changeTheme('blue')">
-                <div class="theme-color" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)"></div>
-                <span>Блакитна</span>
-            </div>
-            <div class="theme-option" data-theme="green" onclick="changeTheme('green')">
-                <div class="theme-color" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)"></div>
-                <span>Зелена</span>
-            </div>
-            <div class="theme-option" data-theme="dark" onclick="changeTheme('dark')">
-                <div class="theme-color" style="background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%)"></div>
-                <span>Темна</span>
-            </div>
+            <div class="theme-option" data-theme="purple" onclick="changeTheme('purple')"><div class="theme-color" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%)"></div><span>Фіолетова</span></div>
+            <div class="theme-option" data-theme="orange" onclick="changeTheme('orange')"><div class="theme-color" style="background: linear-gradient(135deg, #ff7e5f 0%, #feb47b 100%)"></div><span>Оранжева</span></div>
+            <div class="theme-option" data-theme="blue" onclick="changeTheme('blue')"><div class="theme-color" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)"></div><span>Блакитна</span></div>
+            <div class="theme-option" data-theme="green" onclick="changeTheme('green')"><div class="theme-color" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)"></div><span>Зелена</span></div>
+            <div class="theme-option" data-theme="dark" onclick="changeTheme('dark')"><div class="theme-color" style="background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%)"></div><span>Темна</span></div>
         </div>
     </div>
 
     <script>
-        
-        function toggleThemeMenu() {
-            const menu = document.getElementById('themeMenu');
-            menu.classList.toggle('show');
-        }
-        
-        function changeTheme(themeName) {
-            
-            document.body.classList.remove('theme-purple', 'theme-orange', 'theme-blue', 'theme-green', 'theme-dark');
-            
-            document.body.classList.add(`theme-${themeName}`);
-            
-            localStorage.setItem('selectedTheme', themeName);
-            
-            document.getElementById('themeMenu').classList.remove('show');
-        }
-        
-        document.addEventListener('DOMContentLoaded', function() {
-            const savedTheme = localStorage.getItem('selectedTheme') || 'purple';
-            changeTheme(savedTheme);
-        });
-        
-        document.addEventListener('click', function(event) {
-            const themeMenu = document.getElementById('themeMenu');
-            const themeBtn = document.querySelector('.theme-btn');
-            
-            if (!themeBtn.contains(event.target) && !themeMenu.contains(event.target)) {
-                themeMenu.classList.remove('show');
-            }
-        });
+        function toggleThemeMenu() { const menu = document.getElementById('themeMenu'); menu.classList.toggle('show'); }
+        function changeTheme(themeName) { document.body.classList.remove('theme-purple', 'theme-orange', 'theme-blue', 'theme-green', 'theme-dark'); document.body.classList.add(`theme-${themeName}`); localStorage.setItem('selectedTheme', themeName); document.getElementById('themeMenu').classList.remove('show'); }
+        document.addEventListener('DOMContentLoaded', function() { const savedTheme = localStorage.getItem('selectedTheme') || 'purple'; changeTheme(savedTheme); });
+        document.addEventListener('click', function(event) { const themeMenu = document.getElementById('themeMenu'); const themeBtn = document.querySelector('.theme-btn'); if (!themeBtn.contains(event.target) && !themeMenu.contains(event.target)) { themeMenu.classList.remove('show'); } });
     </script>
 </body>
 </html>

@@ -34,7 +34,25 @@ def add_months(source_date, months):
 
 @app.route("/")
 def home():
-    return render_template("home.html")
+    # Якщо користувач не увійшов - показуємо стару головну
+    if not current_user.is_authenticated:
+        return render_template("home.html")
+    
+    # === СТАТИСТИКА ===
+    # 1. Рахуємо кількість договорів
+    contracts_count = Contract.query.filter_by(user_id=current_user.id).count()
+    
+    # 2. Рахуємо загальну суму грошей (через SQL-функцію SUM)
+    total_money = db.session.query(db.func.sum(Contract.amount)).filter_by(user_id=current_user.id).scalar() or 0
+    
+    # 3. Рахуємо події на сьогодні
+    today = datetime.now().date()
+    events_today = Event.query.filter_by(user_id=current_user.id, date=today).count()
+
+    return render_template("home.html", 
+                           contracts_count=contracts_count, 
+                           total_money=total_money,
+                           events_today=events_today)
 
 @app.route("/current-month")
 @login_required
@@ -320,12 +338,58 @@ def add_event_form(date):
     event_date = datetime.strptime(date, "%Y-%m-%d").date()
     return render_template("add_event.html", date=event_date)
 
+# === НОВЕ: СПИСОК ДОГОВОРІВ ТА ПОШУК ===
+@app.route("/contracts")
+@login_required
+def all_contracts():
+    query = request.args.get('q', '').strip()
+    
+    if query:
+        # Шукаємо по номеру АБО по клієнту
+        contracts = Contract.query.filter(
+            (Contract.user_id == current_user.id) & 
+            ((Contract.number.contains(query)) | (Contract.client_name.contains(query)))
+        ).order_by(Contract.start_date.desc()).all()
+    else:
+        # Якщо пошуку немає - показуємо всі
+        contracts = Contract.query.filter_by(user_id=current_user.id).order_by(Contract.start_date.desc()).all()
+    
+    return render_template("contracts.html", contracts=contracts, search_query=query)
+
+# === НОВЕ: ШВИДКЕ АНУЛЮВАННЯ ПО ID ===
+@app.route("/cancel/<int:contract_id>", methods=["POST"])
+@login_required
+def cancel_contract_id(contract_id):
+    contract = Contract.query.filter_by(id=contract_id, user_id=current_user.id).first_or_404()
+    
+    deleted_info = f"{contract.number} ({contract.client_name})"
+    target_email = contract.client_email
+    
+    # Відправка листа
+    try:
+        msg = Message(f"⚠️ Договір №{contract.number} АНУЛЬОВАНО",
+                      recipients=[target_email, current_user.email])
+        msg.body = f"Шановний клієнте! Ваш договір №{contract.number} анульовано менеджером."
+        mail.send(msg)
+    except Exception as e:
+        print(f"Mail error: {e}")
+
+    db.session.delete(contract)
+    db.session.commit()
+    
+    flash(f'Договір {deleted_info} успішно анульовано.', 'info')
+    return redirect(url_for('all_contracts'))
+
 @app.route("/add", methods=["POST"])
 @login_required
 def add_event():
     title = request.form["title"]
     date_str = request.form["date"]
     desc = request.form.get("description", "")
+    
+    # 1. Retrieve the priority from the form. Default to 'medium' if missing.
+    priority = request.form.get("priority", "medium") 
+
     event_date = datetime.strptime(date_str, "%Y-%m-%d").date()
     
     event = Event(
@@ -333,7 +397,8 @@ def add_event():
         date=event_date,
         description=desc,
         user_id=current_user.id,
-        priority='medium' 
+        # 2. Use the variable 'priority' instead of the string 'medium'
+        priority=priority 
     )
     db.session.add(event)
     db.session.commit()

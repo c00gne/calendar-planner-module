@@ -1,0 +1,59 @@
+{% extends "home.html" %}
+
+{% block content %}
+<div class="container mt-4" style="max-width: 900px;">
+    <h2>🗂 Реєстр договорів</h2>
+
+    <form action="{{ url_for('all_contracts') }}" method="GET" style="margin-bottom: 30px; display: flex; gap: 10px;">
+        <input type="text" name="q" placeholder="Пошук за номером або клієнтом..." value="{{ search_query }}" 
+               style="flex-grow: 1; padding: 12px; border-radius: 25px; border: 2px solid #ddd;">
+        <button type="submit" class="btn btn-primary" style="margin: 0; min-width: 100px;">🔍 Знайти</button>
+        {% if search_query %}
+            <a href="{{ url_for('all_contracts') }}" class="btn btn-secondary" style="margin: 0; display: flex; align-items: center;">❌ Скинути</a>
+        {% endif %}
+    </form>
+
+    {% if contracts %}
+    <div style="background: white; border-radius: 15px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
+        <table style="width: 100%; border-collapse: collapse; color: #333;">
+            <thead style="background: #f8f9fa; border-bottom: 2px solid #eee;">
+                <tr>
+                    <th style="padding: 15px; text-align: left;">Номер</th>
+                    <th style="padding: 15px; text-align: left;">Клієнт</th>
+                    <th style="padding: 15px; text-align: left;">Email</th>
+                    <th style="padding: 15px; text-align: right;">Сума</th>
+                    <th style="padding: 15px; text-align: center;">Дата</th>
+                    <th style="padding: 15px; text-align: center;">Дії</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for c in contracts %}
+                <tr style="border-bottom: 1px solid #eee;">
+                    <td style="padding: 15px; font-weight: bold; color: #764ba2;">{{ c.number }}</td>
+                    <td style="padding: 15px;">{{ c.client_name }}</td>
+                    <td style="padding: 15px; color: #666; font-size: 0.9em;">{{ c.client_email }}</td>
+                    <td style="padding: 15px; text-align: right; font-weight: bold; color: #43e97b;">
+                        {{ "{:,.2f}".format(c.amount).replace(',', ' ') }} ₴
+                    </td>
+                    <td style="padding: 15px; text-align: center;">{{ c.start_date.strftime('%d.%m.%Y') }}</td>
+                    <td style="padding: 15px; text-align: center;">
+                        <form action="{{ url_for('cancel_contract_id', contract_id=c.id) }}" method="POST" onsubmit="return confirm('Анулювати договір {{ c.number }}? Клієнт отримає лист.');">
+                            <button type="submit" style="background: none; border: none; cursor: pointer; font-size: 1.2em;" title="Анулювати">❌</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+        <div style="text-align: center; padding: 40px; color: #fff;">
+            <h3>Нічого не знайдено 🕵️‍♂️</h3>
+        </div>
+    {% endif %}
+
+    <div style="margin-top: 30px; text-align: center;">
+        <a href="{{ url_for('home') }}" class="btn btn-secondary" style="color: white;">🔙 На головну</a>
+    </div>
+</div>
+{% endblock %}
