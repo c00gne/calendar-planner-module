@@ -18,6 +18,52 @@
             color: #333;
             min-height: 100vh;
         }
+
+        /* === СТИЛІ ДЛЯ СПЛИВАЮЧИХ ПОВІДОМЛЕНЬ (TOASTS) === */
+        .global-flash-container {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 9999;
+            width: 90%;
+            max-width: 400px;
+            pointer-events: none;
+        }
+
+        .custom-alert {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px 20px;
+            margin-bottom: 10px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            animation: slideDown 0.5s ease forwards;
+            pointer-events: auto;
+            border-left: 5px solid #667eea;
+            font-family: 'Arial', sans-serif;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .custom-alert.success { border-left-color: #43e97b; }
+        .custom-alert.danger  { border-left-color: #ff6b6b; }
+        .custom-alert.warning { border-left-color: #fcc419; }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeOut {
+            from { opacity: 1; transform: translateY(0); }
+            to { opacity: 0; transform: translateY(-20px); }
+        }
+        /* ================================================== */
+
         .user-info {
             position: absolute;
             top: 20px;
@@ -33,37 +79,6 @@
             color: var(--primary-color);
             text-decoration: none;
             font-weight: bold;
-        }
-        .flash-messages {
-            position: fixed;
-            top: 80px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 1050;
-            width: 90%;
-            max-width: 500px;
-        }
-        .alert {
-            padding: 15px;
-            margin-bottom: 10px;
-            border-radius: 8px;
-            font-weight: bold;
-            text-align: center;
-        }
-        .alert-success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-        .alert-danger {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-        .alert-info {
-            background: #d1ecf1;
-            color: #0c5460;
-            border: 1px solid #bee5eb;
         }
         .container {
             max-width: 800px;
@@ -81,14 +96,6 @@
             text-align: center;
             margin-bottom: 30px;
             color: var(--primary-color);
-        }
-        .message { 
-            background: #d4edda; 
-            color: #155724; 
-            padding: 15px; 
-            margin-bottom: 20px; 
-            border-radius: 8px;
-            border-left: 4px solid #28a745;
         }
         .events-list {
             list-style: none;
@@ -125,24 +132,11 @@
             font-weight: bold;
             transition: all 0.3s ease;
         }
-        .edit-btn {
-            background: #ffc107;
-            color: #000;
-        }
-        .delete-btn {
-            background: #dc3545;
-            color: white;
-        }
-        .edit-btn:hover {
-            background: #e0a800;
-        }
-        .delete-btn:hover {
-            background: #c82333;
-        }
-        .navigation {
-            text-align: center;
-            margin-top: 30px;
-        }
+        .edit-btn { background: #ffc107; color: #000; }
+        .delete-btn { background: #dc3545; color: white; }
+        .edit-btn:hover { background: #e0a800; }
+        .delete-btn:hover { background: #c82333; }
+        .navigation { text-align: center; margin-top: 30px; }
         .btn {
             padding: 12px 25px;
             background: var(--primary-color);
@@ -168,123 +162,22 @@
             padding: 40px;
         }
         
-        .theme-switcher {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            z-index: 1000;
-        }
-        
-        .theme-btn {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: var(--primary-gradient);
-            border: none;
-            color: white;
-            font-size: 24px;
-            cursor: pointer;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .theme-btn:hover {
-            transform: scale(1.1) rotate(15deg);
-            box-shadow: 0 6px 25px rgba(0,0,0,0.4);
-        }
-        
-        .theme-menu {
-            display: none;
-            position: absolute;
-            bottom: 70px;
-            right: 0;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-            padding: 15px;
-            min-width: 150px;
-            animation: slideUp 0.3s ease;
-        }
-        
-        .theme-menu.show {
-            display: block;
-        }
-        
-        .theme-option {
-            display: flex;
-            align-items: center;
-            padding: 10px;
-            cursor: pointer;
-            border-radius: 8px;
-            transition: background 0.3s ease;
-            margin-bottom: 5px;
-        }
-        
-        .theme-option:last-child {
-            margin-bottom: 0;
-        }
-        
-        .theme-option:hover {
-            background: #f8f9fa;
-        }
-        
-        .theme-color {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            margin-right: 10px;
-            border: 2px solid #f0f0f0;
-        }
-        
-        .theme-option span {
-            color: #333;
-            font-size: 14px;
-            font-weight: 500;
-        }
-        
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        .theme-purple {
-            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --primary-color: #764ba2;
-            --secondary-color: #667eea;
-        }
-        
-        .theme-orange {
-            --primary-gradient: linear-gradient(135deg, #ff7e5f 0%, #feb47b 100%);
-            --primary-color: #ff7e5f;
-            --secondary-color: #feb47b;
-        }
-        
-        .theme-blue {
-            --primary-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-            --primary-color: #4facfe;
-            --secondary-color: #00f2fe;
-        }
-        
-        .theme-green {
-            --primary-gradient: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
-            --primary-color: #43e97b;
-            --secondary-color: #38f9d7;
-        }
-        
-        .theme-dark {
-            --primary-gradient: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
-            --primary-color: #2c3e50;
-            --secondary-color: #3498db;
-        }
+        .theme-switcher { position: fixed; bottom: 30px; right: 30px; z-index: 1000; }
+        .theme-btn { width: 60px; height: 60px; border-radius: 50%; background: var(--primary-gradient); border: none; color: white; font-size: 24px; cursor: pointer; box-shadow: 0 4px 20px rgba(0,0,0,0.3); transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; }
+        .theme-btn:hover { transform: scale(1.1) rotate(15deg); box-shadow: 0 6px 25px rgba(0,0,0,0.4); }
+        .theme-menu { display: none; position: absolute; bottom: 70px; right: 0; background: white; border-radius: 15px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); padding: 15px; min-width: 150px; animation: slideUp 0.3s ease; }
+        .theme-menu.show { display: block; }
+        .theme-option { display: flex; align-items: center; padding: 10px; cursor: pointer; border-radius: 8px; transition: background 0.3s ease; margin-bottom: 5px; }
+        .theme-option:last-child { margin-bottom: 0; }
+        .theme-option:hover { background: #f8f9fa; }
+        .theme-color { width: 20px; height: 20px; border-radius: 50%; margin-right: 10px; border: 2px solid #f0f0f0; }
+        .theme-option span { color: #333; font-size: 14px; font-weight: 500; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .theme-purple { --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%); --primary-color: #764ba2; --secondary-color: #667eea; }
+        .theme-orange { --primary-gradient: linear-gradient(135deg, #ff7e5f 0%, #feb47b 100%); --primary-color: #ff7e5f; --secondary-color: #feb47b; }
+        .theme-blue { --primary-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); --primary-color: #4facfe; --secondary-color: #00f2fe; }
+        .theme-green { --primary-gradient: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); --primary-color: #43e97b; --secondary-color: #38f9d7; }
+        .theme-dark { --primary-gradient: linear-gradient(135deg, #2c3e50 0%, #3498db 100%); --primary-color: #2c3e50; --secondary-color: #3498db; }
     </style>
 </head>
 <body>
@@ -295,26 +188,24 @@
         {% endif %}
     </div>
 
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            <div class="flash-messages">
+    <div class="global-flash-container" id="flashContainer">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
                 {% for category, message in messages %}
-                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                    <div class="custom-alert {{ category }}">
+                        <span>{{ message }}</span>
+                        <span style="cursor: pointer; margin-left: 10px; font-weight: bold; color: #999;" onclick="this.parentElement.remove()">✕</span>
+                    </div>
                 {% endfor %}
-            </div>
-        {% endif %}
-    {% endwith %}
-
+            {% endif %}
+        {% endwith %}
+    </div>
     <div class="container">
         <div class="content">
             <div class="header">
                 <h1>📖 Події за {{ date.strftime('%d.%m.%Y') }}</h1>
             </div>
 
-            {% if message %}
-                <div class="message">{{ message }}</div>
-            {% endif %}
-            
             {% if events %}
                 <ul class="events-list">
                 {% for e in events %}
@@ -348,67 +239,35 @@
     <div class="theme-switcher">
         <button class="theme-btn" onclick="toggleThemeMenu()">🎨</button>
         <div class="theme-menu" id="themeMenu">
-            <div class="theme-option" data-theme="purple" onclick="changeTheme('purple')">
-                <div class="theme-color" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%)"></div>
-                <span>Фіолетова</span>
-            </div>
-            <div class="theme-option" data-theme="orange" onclick="changeTheme('orange')">
-                <div class="theme-color" style="background: linear-gradient(135deg, #ff7e5f 0%, #feb47b 100%)"></div>
-                <span>Оранжева</span>
-            </div>
-            <div class="theme-option" data-theme="blue" onclick="changeTheme('blue')">
-                <div class="theme-color" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)"></div>
-                <span>Блакитна</span>
-            </div>
-            <div class="theme-option" data-theme="green" onclick="changeTheme('green')">
-                <div class="theme-color" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)"></div>
-                <span>Зелена</span>
-            </div>
-            <div class="theme-option" data-theme="dark" onclick="changeTheme('dark')">
-                <div class="theme-color" style="background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%)"></div>
-                <span>Темна</span>
-            </div>
+            <div class="theme-option" data-theme="purple" onclick="changeTheme('purple')"><div class="theme-color" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%)"></div><span>Фіолетова</span></div>
+            <div class="theme-option" data-theme="orange" onclick="changeTheme('orange')"><div class="theme-color" style="background: linear-gradient(135deg, #ff7e5f 0%, #feb47b 100%)"></div><span>Оранжева</span></div>
+            <div class="theme-option" data-theme="blue" onclick="changeTheme('blue')"><div class="theme-color" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)"></div><span>Блакитна</span></div>
+            <div class="theme-option" data-theme="green" onclick="changeTheme('green')"><div class="theme-color" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)"></div><span>Зелена</span></div>
+            <div class="theme-option" data-theme="dark" onclick="changeTheme('dark')"><div class="theme-color" style="background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%)"></div><span>Темна</span></div>
         </div>
     </div>
 
     <script>
-        function toggleThemeMenu() {
-            const menu = document.getElementById('themeMenu');
-            menu.classList.toggle('show');
-        }
-        
-        function changeTheme(themeName) {
-            document.body.classList.remove('theme-purple', 'theme-orange', 'theme-blue', 'theme-green', 'theme-dark');
-            
-            document.body.classList.add(`theme-${themeName}`);
-            
-            localStorage.setItem('selectedTheme', themeName);
-            
-            document.getElementById('themeMenu').classList.remove('show');
-        }
-        
-        document.addEventListener('DOMContentLoaded', function() {
-            const savedTheme = localStorage.getItem('selectedTheme') || 'purple';
-            changeTheme(savedTheme);
-        });
-        
-        document.addEventListener('click', function(event) {
-            const themeMenu = document.getElementById('themeMenu');
-            const themeBtn = document.querySelector('.theme-btn');
-            
-            if (!themeBtn.contains(event.target) && !themeMenu.contains(event.target)) {
-                themeMenu.classList.remove('show');
-            }
-        });
+        function toggleThemeMenu() { const menu = document.getElementById('themeMenu'); menu.classList.toggle('show'); }
+        function changeTheme(themeName) { document.body.classList.remove('theme-purple', 'theme-orange', 'theme-blue', 'theme-green', 'theme-dark'); document.body.classList.add(`theme-${themeName}`); localStorage.setItem('selectedTheme', themeName); document.getElementById('themeMenu').classList.remove('show'); }
+        document.addEventListener('DOMContentLoaded', function() { const savedTheme = localStorage.getItem('selectedTheme') || 'purple'; changeTheme(savedTheme); });
+        document.addEventListener('click', function(event) { const themeMenu = document.getElementById('themeMenu'); const themeBtn = document.querySelector('.theme-btn'); if (!themeBtn.contains(event.target) && !themeMenu.contains(event.target)) { themeMenu.classList.remove('show'); } });
 
-        setTimeout(function() {
-            const flashMessages = document.querySelector('.flash-messages');
-            if (flashMessages) {
-                flashMessages.style.transition = 'opacity 0.5s ease';
-                flashMessages.style.opacity = '0';
-                setTimeout(() => flashMessages.remove(), 500);
+        // === СКРИПТ АВТОМАТИЧНОГО ЗНИКНЕННЯ (Той самий, що в home.html) ===
+        document.addEventListener("DOMContentLoaded", function() {
+            const alerts = document.querySelectorAll('.custom-alert');
+            
+            if (alerts.length > 0) {
+                setTimeout(function() {
+                    alerts.forEach(function(alert, index) {
+                        setTimeout(function() {
+                            alert.style.animation = "fadeOut 0.5s ease forwards";
+                            setTimeout(() => alert.remove(), 500);
+                        }, index * 200); 
+                    });
+                }, 3500); // Час очікування - 3.5 секунди
             }
-        }, 5000);
+        });
     </script>
 </body>
 </html>

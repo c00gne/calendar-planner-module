@@ -12,6 +12,52 @@
             color: #333;
             min-height: 100vh;
         }
+
+        /* === СТИЛІ ДЛЯ СПЛИВАЮЧИХ ПОВІДОМЛЕНЬ (TOASTS) === */
+        .global-flash-container {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 9999;
+            width: 90%;
+            max-width: 400px;
+            pointer-events: none;
+        }
+
+        .custom-alert {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px 20px;
+            margin-bottom: 10px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            animation: slideDown 0.5s ease forwards;
+            pointer-events: auto;
+            border-left: 5px solid #667eea;
+            font-family: 'Arial', sans-serif;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .custom-alert.success { border-left-color: #43e97b; }
+        .custom-alert.danger  { border-left-color: #ff6b6b; }
+        .custom-alert.warning { border-left-color: #fcc419; }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeOut {
+            from { opacity: 1; transform: translateY(0); }
+            to { opacity: 0; transform: translateY(-20px); }
+        }
+        /* ================================================== */
+
         .user-info {
             position: absolute;
             top: 20px;
@@ -28,9 +74,6 @@
             color: #764ba2;
             text-decoration: none;
             font-weight: bold;
-        }
-        .user-info a:hover {
-            text-decoration: underline;
         }
         .container {
             max-width: 1400px;
@@ -195,19 +238,19 @@
 
         /* --- СТИЛІ ДЛЯ ПРІОРИТЕТІВ --- */
         li.priority-high {
-            background-color: #ff6b6b !important; /* Червоний для платежів */
+            background-color: #ff6b6b !important;
             color: white !important;
             border-left: 3px solid #c92a2a !important;
         }
         li.priority-medium {
-            background-color: #fcc419 !important; /* Жовтий для зустрічей */
+            background-color: #f0f4ff !important;
             color: #333 !important;
-            border-left: 3px solid #e67700 !important;
+            border-left: 3px solid #667eea !important;
         }
         li.priority-low {
-            background-color: #dee2e6 !important; /* Сірий для рутини */
-            color: #333 !important;
-            border-left: 3px solid #adb5bd !important;
+            background-color: #e9ecef !important;
+            color: #495057 !important;
+            border-left: 3px solid #ced4da !important;
         }
 
         .add-btn { 
@@ -593,6 +636,18 @@
         {% endif %}
     </div>
 
+    <div class="global-flash-container" id="flashContainer">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="custom-alert {{ category }}">
+                        <span>{{ message }}</span>
+                        <span style="cursor: pointer; margin-left: 10px; font-weight: bold; color: #999;" onclick="this.parentElement.remove()">✕</span>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
     <div class="container">
         <div class="calendar-header">
             <button class="nav-btn" onclick="navigateMonth(-1)">‹</button>
@@ -657,7 +712,6 @@
         </div>
 
         <div class="bottom-toolbar">
-            
             <a href="{{ url_for('add_contract') }}" class="btn-success">➕ Новий Договір</a>
 
             <div class="upcoming-events">
@@ -708,7 +762,6 @@
             </div>
 
             <a href="{{ url_for('cancel_contract') }}" class="btn-danger">❌ Анулювати договір</a>
-        
         </div>
 
     </div>
@@ -819,10 +872,18 @@
             this.scrollTop += event.deltaY;
         });
 
-        document.addEventListener('DOMContentLoaded', function() {
-            const todayElement = document.querySelector('.day.today');
-            if (todayElement) {
-                todayElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        // СКРИПТ ДЛЯ ЗНИКНЕННЯ ПОВІДОМЛЕНЬ
+        document.addEventListener("DOMContentLoaded", function() {
+            const alerts = document.querySelectorAll('.custom-alert');
+            if (alerts.length > 0) {
+                setTimeout(function() {
+                    alerts.forEach(function(alert, index) {
+                        setTimeout(function() {
+                            alert.style.animation = "fadeOut 0.5s ease forwards";
+                            setTimeout(() => alert.remove(), 500);
+                        }, index * 200); 
+                    });
+                }, 3500);
             }
         });
     </script>

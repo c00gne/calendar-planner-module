@@ -22,6 +22,53 @@
             justify-content: center;
             align-items: center;
         }
+
+        /* === СТИЛІ ДЛЯ СПЛИВАЮЧИХ ПОВІДОМЛЕНЬ (TOASTS) === */
+        .global-flash-container {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 9999; /* Найвищий пріоритет - поверх усього */
+            width: 90%;
+            max-width: 400px;
+            pointer-events: none; /* Щоб крізь пусте місце можна було клікати */
+        }
+
+        .custom-alert {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px 20px;
+            margin-bottom: 10px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            animation: slideDown 0.5s ease forwards;
+            pointer-events: auto; /* Саме повідомлення клікабельне */
+            border-left: 5px solid #667eea;
+            font-family: 'Arial', sans-serif;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .custom-alert.success { border-left-color: #43e97b; } /* Зелений */
+        .custom-alert.danger  { border-left-color: #ff6b6b; } /* Червоний */
+        .custom-alert.warning { border-left-color: #fcc419; } /* Жовтий */
+        .custom-alert.info    { border-left-color: #4facfe; } /* Блакитний */
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeOut {
+            from { opacity: 1; transform: translateY(0); }
+            to { opacity: 0; transform: translateY(-20px); }
+        }
+        /* ================================================== */
+
         .container {
             background: rgba(255, 255, 255, 0.1);
             padding: 50px;
@@ -56,7 +103,7 @@
             cursor: pointer;
             font-size: 1.2em;
             font-weight: bold;
-            margin: 10px; /* Трохи змінив відступ */
+            margin: 10px;
             display: inline-block;
             transition: all 0.3s ease;
             box-shadow: 0 5px 15px rgba(0,0,0,0.2);
@@ -72,7 +119,6 @@
             font-size: 1.3em;
             padding: 20px 40px;
         }
-        /* --- НОВИЙ СТИЛЬ ДЛЯ ЗЕЛЕНОЇ КНОПКИ --- */
         .btn-success {
             background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
             color: #2c3e50;
@@ -149,8 +195,20 @@
     </style>
 </head>
 <body>
+
+    <div class="global-flash-container" id="flashContainer">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="custom-alert {{ category }}">
+                        <span>{{ message }}</span>
+                        <span style="cursor: pointer; margin-left: 10px; font-weight: bold; color: #999;" onclick="this.parentElement.remove()">✕</span>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
     <div class="container">
-        
         {% block content %}
         
             <div class="logo">📅</div>
@@ -168,18 +226,9 @@
                 </div>
                 
                 <div class="features">
-                    <div class="feature">
-                        <div class="feature-icon">📝</div>
-                        <div class="feature-text">Створюйте події</div>
-                    </div>
-                    <div class="feature">
-                        <div class="feature-icon">📅</div>
-                        <div class="feature-text">Плануйте день</div>
-                    </div>
-                    <div class="feature">
-                        <div class="feature-icon">🔔</div>
-                        <div class="feature-text">Не пропускайте</div>
-                    </div>
+                    <div class="feature"><div class="feature-icon">📝</div><div class="feature-text">Створюйте події</div></div>
+                    <div class="feature"><div class="feature-icon">📅</div><div class="feature-text">Плануйте день</div></div>
+                    <div class="feature"><div class="feature-icon">🔔</div><div class="feature-text">Не пропускайте</div></div>
                 </div>
                 
                 <div class="auth-links">
@@ -200,7 +249,8 @@
                 </div>
             {% endif %}
         
-        {% endblock %} </div>
+        {% endblock %} 
+    </div>
 
     <div class="theme-switcher">
         <button class="theme-btn" onclick="toggleThemeMenu()">🎨</button>
@@ -212,11 +262,31 @@
             <div class="theme-option" data-theme="dark" onclick="changeTheme('dark')"><div class="theme-color" style="background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%)"></div><span>Темна</span></div>
         </div>
     </div>
+    
     <script>
         function toggleThemeMenu() { const menu = document.getElementById('themeMenu'); menu.classList.toggle('show'); }
         function changeTheme(themeName) { document.body.classList.remove('theme-purple', 'theme-orange', 'theme-blue', 'theme-green', 'theme-dark'); document.body.classList.add(`theme-${themeName}`); localStorage.setItem('selectedTheme', themeName); document.getElementById('themeMenu').classList.remove('show'); }
         document.addEventListener('DOMContentLoaded', function() { const savedTheme = localStorage.getItem('selectedTheme') || 'purple'; changeTheme(savedTheme); });
         document.addEventListener('click', function(event) { const themeMenu = document.getElementById('themeMenu'); const themeBtn = document.querySelector('.theme-btn'); if (!themeBtn.contains(event.target) && !themeMenu.contains(event.target)) { themeMenu.classList.remove('show'); } });
+
+        // === СКРИПТ АВТОМАТИЧНОГО ЗНИКНЕННЯ ===
+        document.addEventListener("DOMContentLoaded", function() {
+            const alerts = document.querySelectorAll('.custom-alert');
+            
+            if (alerts.length > 0) {
+                // Таймер: через 3.5 секунди починаємо ховати
+                setTimeout(function() {
+                    alerts.forEach(function(alert, index) {
+                        // Робимо каскадне зникнення
+                        setTimeout(function() {
+                            alert.style.animation = "fadeOut 0.5s ease forwards";
+                            // Видаляємо з HTML після анімації
+                            setTimeout(() => alert.remove(), 500);
+                        }, index * 200); 
+                    });
+                }, 3500);
+            }
+        });
     </script>
 </body>
 </html>
