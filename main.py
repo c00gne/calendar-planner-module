@@ -131,6 +131,7 @@ def add_contract():
     if request.method == "POST":
         number = request.form["number"]
         client = request.form["client"]
+        client_email = request.form["client_email"] # <--- Отримуємо email клієнта
         amount = float(request.form["amount"])
         start_date_str = request.form["start_date"]
         duration = int(request.form["duration"])
@@ -140,6 +141,7 @@ def add_contract():
         contract = Contract(
             number=number,
             client_name=client,
+            client_email=client_email, # <--- Зберігаємо в БД
             amount=amount,
             start_date=start_date,
             duration_months=duration,
@@ -165,37 +167,34 @@ def add_contract():
 
         # --- ПОЧАТОК БЛОКУ ВІДПРАВКИ ---
         try:
-            # Формуємо лист
-            msg = Message(f"✅ Договір №{number} створено",
-                          recipients=[current_user.email]) # Відправляємо на пошту тому, хто залогінився
+            # Формуємо лист для клієнта
+            msg = Message(f"✅ Ваш договір №{number} створено",
+                          recipients=[client_email, current_user.email]) # Клієнту і копію менеджеру
             
             msg.body = f"""
-            Вітаємо, {current_user.username}!
+            Шановний клієнте {client}!
             
-            У системі успішно створено новий лізинговий договір.
+            Ваш лізинговий договір успішно зареєстровано.
             
             ------------------------------------------------
-            🔹 Клієнт: {client}
             🔹 Номер договору: {number}
-            🔹 Сума договору: {amount:,.2f} грн
+            🔹 Сума: {amount:,.2f} грн
             🔹 Термін: {duration} міс.
             🔹 Дата початку: {start_date}
             ------------------------------------------------
             
-            Графік з {duration} платежів вже згенеровано у вашому календарі.
-            Перший платіж заплановано на: {start_date}
+            Графік платежів сформовано.
             
             З повагою,
-            Ваш Compact Planner 🤖
+            Ваш персональний менеджер: {current_user.username}
+            Compact Planner System
             """
             
-            # Відправляємо
             mail.send(msg)
-            Analytics.log(f"Email sent to {current_user.email}")
-            flash(f'Договір створено! Лист успішно надіслано на {current_user.email}', 'success')
+            Analytics.log(f"Email sent to client: {client_email}")
+            flash(f'Договір створено! Лист надіслано клієнту: {client_email}', 'success')
             
         except Exception as e:
-            # Якщо помилка (немає інтернету або пароль не той) - програма НЕ впаде, просто напише помилку
             print(f"Помилка пошти: {e}") 
             Analytics.log(f"Email error: {e}")
             flash(f'Договір створено, але лист не надіслано (перевірте консоль).', 'warning')
@@ -206,6 +205,7 @@ def add_contract():
 
     return render_template("add_contract.html")
 
+# === [4] АНУЛЮВАННЯ ДОГОВОРУ З EMAIL ===
 @app.route("/cancel_contract", methods=["GET", "POST"])
 @login_required
 def cancel_contract():
@@ -218,10 +218,31 @@ def cancel_contract():
 
         if contract:
             deleted_info = f"{contract.number} ({contract.client_name})"
+            target_email = contract.client_email # Запам'ятовуємо email перед видаленням
+            
+            # --- ВІДПРАВКА ЛИСТА ПРО АНУЛЮВАННЯ ---
+            try:
+                msg = Message(f"⚠️ Договір №{contract.number} АНУЛЬОВАНО",
+                              recipients=[target_email, current_user.email])
+                
+                msg.body = f"""
+                Шановний клієнте!
+                
+                Повідомляємо, що ваш договір №{contract.number} було розірвано/анульовано.
+                Всі заплановані платежі скасовано.
+                
+                Якщо це помилка, зв'яжіться з вашим менеджером: {current_user.username}
+                """
+                mail.send(msg)
+                print(f"Cancellation email sent to {target_email}")
+            except Exception as e:
+                print(f"Cancellation email failed: {e}")
+            # -------------------------------------
+
             db.session.delete(contract)
             db.session.commit()
             Analytics.log(f"Contract cancelled: {deleted_info}")
-            flash(f'Договір {deleted_info} анульовано. Події видалено.', 'danger')
+            flash(f'Договір {deleted_info} анульовано. Клієнта повідомлено поштою.', 'danger')
             return redirect(url_for('current_month'))
         else:
             flash(f'Договір "{query}" не знайдено.', 'warning')

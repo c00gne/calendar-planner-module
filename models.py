@@ -30,6 +30,7 @@ class Contract(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     number = db.Column(db.String(50), nullable=False)   
     client_name = db.Column(db.String(100), nullable=False) 
+    client_email = db.Column(db.String(120), nullable=False) # <--- НОВЕ ПОЛЕ
     amount = db.Column(db.Float, nullable=False)       
     start_date = db.Column(db.Date, nullable=False)    
     duration_months = db.Column(db.Integer, nullable=False) 
